@@ -82,7 +82,7 @@ void BaseAPI::CMDCommand(LPTSTR command)
 
 	PROCESS_INFORMATION pi;
 	TCHAR* commandline = new TCHAR[sizeof(command)];
-	StrCpyW(commandline, command);
+	lstrcpyW(commandline, command);
 	BOOL bRet = CreateProcess(NULL, commandline, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);//
 
 	if (bRet)

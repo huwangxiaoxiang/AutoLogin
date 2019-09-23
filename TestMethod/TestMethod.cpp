@@ -6,6 +6,7 @@
 #include "BaseAPI.h"
 #include "PageRecThread.h"
 #include "Page.h"
+#include <tchar.h>
 
 void showPix(KeyPoint point) {
 	BaseAPI api;
@@ -18,6 +19,38 @@ void showPix(KeyPoint point) {
 	COLORREF color=col.Collection(tank,offset);
 	std::cout << "(" << point.getOffsetX() << "," << point.getOffsetY() << ") (" <<offset.x<<","<<offset.y<<") "<< color <<" 置信度："<<col.percent<<"%"<< std::endl;
 
+}
+
+HWND service;
+
+BOOL CALLBACK EnumChild2(HWND hWnd, LPARAM lParam)
+{
+	TCHAR temp1[MAX_PATH], temp2[MAX_PATH];
+	::GetWindowText(hWnd, temp1, MAX_PATH);
+	if (lstrcmp(temp1, L"Button11")==0) {
+		//std::wcout << L"找到了" << temp1 << L" " << hWnd << std::endl;
+		service = (HWND)lParam;
+	}
+	return true;
+}
+
+BOOL CALLBACK EnumChildProc(HWND hWnd, LPARAM lParam)
+{
+	TCHAR temp1[MAX_PATH], temp2[MAX_PATH];
+	::GetClassName(hWnd, temp1, MAX_PATH);
+	/**/if (lstrcmp(temp1,L"#32770")==0) {
+		EnumChildWindows(hWnd, EnumChild2, (LPARAM)hWnd);
+	}
+	return true;
+}
+
+void DlgFind() {
+	BaseAPI api;
+	HWND tank = api.getProcessHWND("#32770", "坦克大战登陆器");
+	
+	HWND nHwnd = ::FindWindow(L"#32770",NULL);
+	EnumChildWindows(NULL,EnumChildProc, 0);
+	
 }
 
 int main()
@@ -41,6 +74,7 @@ int main()
 	PixCollect collect;
 	std::cout << collect.Collection(hwnd, 832, 105) << std::endl;*/
 
+	/*
 	Page home = Page(1, L"主页");
 	home.addKeyPoint(KeyPoint(281, 61, 1059906, BASEP_LEFT_TOP));
 	home.addKeyPoint(KeyPoint(-468, -71, 1066495, BASEP_CENTER_BOTTOM));
@@ -91,10 +125,9 @@ int main()
 	skillpage.addKeyPoint(KeyPoint(227, -77, 4346268, BASEP_CENTER));
 	skillpage.addKeyPoint(KeyPoint(-93, 135, 4342338, BASEP_CENTER));
 	skillpage.setClose(486, -298, BASEP_CENTER);
+	*/
 
-
-
-
+	
 	/*
 	std::vector<KeyPoint> lists;
 	lists.push_back(KeyPoint(281, 61, 0,BASEP_LEFT_TOP));
@@ -114,14 +147,14 @@ int main()
 		showPix(po);
 	}
 	*/
+	/*
 	int x1, y1, x2, y2;
 	int R, G, B;
-	
 	
 	PixCollect coll;
 	BaseAPI api;
 	
-	
+	std::cout << "输入格式:  x1 x2 y1 y2 r g b" << std::endl;
 	while (true) {
 		HWND tank = api.getProcessHWND("UnityWndClass", "Tank Battle");
 		RECT rect = api.getProcessClient(tank);
@@ -137,8 +170,25 @@ int main()
 				}
 			}
 		}
-	}
+	}*/
+	/*Sleep(2000);
 	
+	HWND tank = api.getProcessHWND("#32770", "坦克大战登陆器");
+	//
+	Sleep(2000);
+	BaseAPI api;
+	DlgFind();
+	RECT rec = api.getProcessClient(service);
+	POINT p;
+	p.x = rec.left +502;
+	p.y = rec.top + 107;
+	api.MoveTo(p.x,p.y);
+	Sleep(100);
+	api.LeftClick(service, 502,107);*/
+	
+	int result = (int)ShellExecute(NULL, L"open",L"C:\\Users\\12703\\AppData\\Roaming\\Tencent\\QQMicroGameBox\\坦克大战", NULL, NULL, SW_SHOW);//打开主程序
+	if (result < 32)
+		MessageBox(NULL, L"启动错误", NULL, NULL);
 	
 	return 0;
 }

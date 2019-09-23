@@ -3,6 +3,8 @@
 #include <conio.h>
 #include "Count.h"
 #include "BaseAPI.h"
+#include "PageManager.h"
+
 class Act:public BaseAPI
 {
 public:
@@ -12,7 +14,6 @@ public:
 	~Act() {}
 private:
 	void ClearWindow();
-	
 	void InputString(CString s);
 
 public:

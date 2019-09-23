@@ -1,5 +1,6 @@
 #include "Page.h"
 #include <tchar.h>
+#include "stdafx.h"
 
 void Page::addKeyPoint(POINT point, COLORREF color,int base_flag)
 {

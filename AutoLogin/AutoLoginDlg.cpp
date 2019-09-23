@@ -102,7 +102,7 @@ BOOL CAutoLoginDlg::OnInitDialog()
 			AfxMessageBox(L"全局快捷键设置失败，全局快捷键将不可用！");
 		}
 	}
-	
+	PageManager::Instance();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 

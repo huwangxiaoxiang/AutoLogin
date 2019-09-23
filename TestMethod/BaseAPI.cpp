@@ -1,4 +1,4 @@
-#include "stdafx.h"
+
 #include "BaseAPI.h"
 
 int BaseAPI::TransformWidth(int old) {
@@ -33,8 +33,9 @@ void BaseAPI::LeftClick(int count) {
 
 void BaseAPI::LeftClick(HWND hwnd, int x, int y)
 {
+
 	PostMessage(hwnd, WM_LBUTTONDOWN, NULL, MAKELONG(x, y));
-	Sleep(50);
+	Sleep(80);
 	PostMessage(hwnd, WM_LBUTTONUP, NULL, MAKELONG(x, y));
 }
 
@@ -82,7 +83,7 @@ void BaseAPI::CMDCommand(LPTSTR command)
 
 	PROCESS_INFORMATION pi;
 	TCHAR* commandline = new TCHAR[sizeof(command)];
-	StrCpyW(commandline, command);
+	lstrcpyW(commandline, command);
 	BOOL bRet = CreateProcess(NULL, commandline, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);//
 
 	if (bRet)

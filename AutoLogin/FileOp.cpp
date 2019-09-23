@@ -12,9 +12,7 @@ FileOp::FileOp(vector<Count> number, CString path)
 void FileOp::Write() {
 	std::wofstream da(path);
 	for (vector<Count>::iterator index = Number.begin(); index < Number.end(); index++){
-		std::wstring m;
-		m =index->GetNumber().GetBuffer(0);
-		da << m;
+		da << index->GetNumber().GetBuffer(0);
 		da << " ";
 		da << (index->GetKey().GetBuffer(0));
 		da << " ";
@@ -34,7 +32,6 @@ void FileOp::Write() {
 
 void FileOp::Read(vector<Count> &CountNumber) {
 	std::wifstream da(path);
-	
 	Count midcount;
 	BOOL service[7];
 	if (da.fail())

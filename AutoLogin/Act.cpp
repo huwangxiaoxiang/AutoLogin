@@ -73,10 +73,9 @@ void Act::Start()
 		//tankPath=DataDir;
 	}
 	int result = (int)ShellExecute(NULL, L"open", DataDir, NULL, NULL, SW_SHOW);//打开主程序
-	Sleep(1000);
 	if (result < 32)
 		MessageBox(NULL, L"启动错误", NULL, NULL);
-	Sleep(2000);
+	Sleep(3000);
 }
 
 void Act::Input()
@@ -147,13 +146,17 @@ void Act::ChooseService(int ser)
 
 void Act::prepare()
 {
-	Sleep(25000);
-	CRect rect = getProcessRect();
-	
-	MoveTo((rect.Width() / 2 + rect.left + 455), (rect.top + rect.Height() / 2 -294+ 10));
-	Sleep(100);
-	LeftClick(1);
-	Sleep(1000);
+	//Sleep(25000);
+	BaseAPI api;
+	HWND tank = api.getProcessHWND(L"UnityWndClass", L"Tank Battle");
+	RECT client = api.getProcessClient(tank);
+	Page page = PageManager::isThisPage(3,tank);
+	if (page.getIndex()==3) {
+		POINT close = page.getClose(tank);
+		api.MoveTo(client.left + close.x , client.top + close.y);
+		api.LeftClick(1);
+		Sleep(1000);
+	}
 	
 }
 

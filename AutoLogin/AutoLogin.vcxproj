@@ -192,6 +192,9 @@
     <ClInclude Include="BaseAPI.h" />
     <ClInclude Include="Count.h" />
     <ClInclude Include="FileOp.h" />
+    <ClInclude Include="KeyPoint.h" />
+    <ClInclude Include="Page.h" />
+    <ClInclude Include="PageManager.h" />
     <ClInclude Include="PixCollect.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -205,6 +208,9 @@
     <ClCompile Include="BaseAPI.cpp" />
     <ClCompile Include="Count.cpp" />
     <ClCompile Include="FileOp.cpp" />
+    <ClCompile Include="KeyPoint.cpp" />
+    <ClCompile Include="Page.cpp" />
+    <ClCompile Include="PageManager.cpp" />
     <ClCompile Include="PixCollect.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

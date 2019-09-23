@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Thread1.h"
 #include "AutoLoginDlg.h"
+
 IMPLEMENT_DYNCREATE(Thread1, CWinThread)
 
 Thread1::Thread1()
@@ -34,24 +35,24 @@ void Thread1::run()
 		{
 			dlg->PostMessage(UPDATE_COUNTS, (WPARAM) &beg->GetNumber(), ser);
 			if (cservice[ser]) {
-				/**/Notify(0);
+				/**///Notify(0);
 				now.Start();
-				Notify(1);
+				//Notify(1);
 				now.Input();
-				Notify(2);
+				//Notify(2);
 				now.ChooseService(ser);
-				Notify(3);
+				//Notify(3);
 				now.prepare();
-				Notify(6);
+				//Notify(6);
 				now.getOnlineGift();
-				Notify(8);
+				//Notify(8);
 				now.getOfflineExperience();
-				Notify(4);
-				now.exit();
+				//Notify(4);
+				now.exit();/**/
 			}
 		}
 	}
-	Notify(7);
+	//Notify(7);
 }
 
 BOOL Thread1::InitInstance()
