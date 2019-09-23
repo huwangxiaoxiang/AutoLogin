@@ -71,7 +71,7 @@ void BaseAPI::KeyPress(int k1, int k2) {
 }
 
 
-void BaseAPI::CMDCommand(LPTSTR command)
+void BaseAPI::CMDCommand(LPCTSTR command)
 {
 
 	STARTUPINFO si;
@@ -81,17 +81,15 @@ void BaseAPI::CMDCommand(LPTSTR command)
 	si.wShowWindow = SW_HIDE;
 
 	PROCESS_INFORMATION pi;
-	TCHAR* commandline = new TCHAR[sizeof(command)];
-	lstrcpyW(commandline, command);
+	TCHAR commandline[MAX_PATH];
+	lstrcpy(commandline, command);
 	BOOL bRet = CreateProcess(NULL, commandline, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);//
-
 	if (bRet)
 	{
 		WaitForSingleObject(pi.hProcess, INFINITE);// µÈ´ý³ÌÐòÍË³ö
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 	}
-
 }
 
 RECT BaseAPI::getProcessRect()

@@ -3,7 +3,8 @@
 
 void Act::ClearWindow()
 {
-	CMDCommand(L"taskkill /im Launcher.exe /im QQMicroGameBox.exe /im  QQMicroGameBoxTray.exe /im Tank.exe /f");
+	BaseAPI api;
+	api.CMDCommand(L"taskkill /im Launcher.exe /im QQMicroGameBox.exe /im  QQMicroGameBoxTray.exe /im Tank.exe /f");
 }
 
 
@@ -64,11 +65,11 @@ void Act::InputString(CString s)
 void Act::Start()
 {
 	ClearWindow();
-	TCHAR DataDir[MAX_PATH] = { 0 };
+	TCHAR DataDir [MAX_PATH];
 	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, DataDir))) {
 		PathAppend(DataDir, L"Tencent\\QQMicroGameBox\\坦克大战");
 	}
-	int result = (int)ShellExecute(NULL, L"open", DataDir, NULL, NULL, SW_SHOW);//打开主程序
+	int result = (int)ShellExecute(NULL, L"open",DataDir, NULL, NULL, SW_SHOW);//打开主程序
 	if (result < 32)
 		MessageBox(NULL, L"启动错误", NULL, NULL);
 	Sleep(3000);
@@ -77,7 +78,6 @@ void Act::Start()
 void Act::Input()
 {
 	RECT rect = getProcessRect(L"LoginDlg", L"LoginDlg");
-	
 	MoveTo(rect.left + 210, rect.top + 381);
 	Sleep(20);
 	LeftClick(1);
@@ -142,7 +142,7 @@ void Act::ChooseService(int ser)
 
 void Act::prepare()
 {
-	//Sleep(25000);
+	Sleep(25000);
 	BaseAPI api;
 	HWND tank = api.getProcessHWND(L"UnityWndClass", L"Tank Battle");
 	RECT client = api.getProcessClient(tank);

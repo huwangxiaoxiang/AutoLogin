@@ -27,32 +27,36 @@ void Thread1::run()
 	FileOp num(numberlist, L"e:\\now.bv");
 	num.Read(numberlist);
 	CAutoLoginDlg* dlg = (CAutoLoginDlg*)GetMainWnd();
-	for (vector<Count>::iterator beg = numberlist.begin(); beg < numberlist.end(); beg++)
+	PageManager::Instance();
+	for (vector<Count>::iterator beg = numberlist.begin(); beg != numberlist.end(); beg++)
 	{
+		
+		Count now_count = *beg;
 		Act now(*beg);
 		BOOL* cservice = now.Number.GetService();
-		for (int ser = 0; ser < 7; ser++)
+		for (int ser = 0; ser <7; ser++)
 		{
-			dlg->PostMessage(UPDATE_COUNTS, (WPARAM) &beg->GetNumber(), ser);
+			dlg->PostMessage(UPDATE_COUNTS, (WPARAM)now_count.GetNumber().AllocSysString(), ser);
 			if (cservice[ser]) {
-				/**///Notify(0);
+				Notify(0);
 				now.Start();
-				//Notify(1);
+				Notify(1);
 				now.Input();
-				//Notify(2);
+				Notify(2);
 				now.ChooseService(ser);
-				//Notify(3);
+				Notify(3);
 				now.prepare();
-				//Notify(6);
+				Notify(6);
 				now.getOnlineGift();
-				//Notify(8);
+				Notify(8);
 				now.getOfflineExperience();
-				//Notify(4);
-				now.exit();/**/
+				Notify(4);
+				now.exit();
 			}
 		}
 	}
-	//Notify(7);
+	Notify(7);
+	
 }
 
 BOOL Thread1::InitInstance()

@@ -102,7 +102,7 @@ BOOL CAutoLoginDlg::OnInitDialog()
 			AfxMessageBox(L"全局快捷键设置失败，全局快捷键将不可用！");
 		}
 	}
-	PageManager::Instance();
+	
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -186,9 +186,10 @@ LRESULT CAutoLoginDlg::OnUpdateState(WPARAM wParam, LPARAM lParam)
 
 LRESULT CAutoLoginDlg::OnUpdateCounts(WPARAM wParam, LPARAM lParam)
 {
-	this->NowNumber = *(CString*)wParam;
+	this->NowNumber = CString((BSTR)wParam);
 	this->NowService = services[lParam];
 	UpdateData(false);
+	SysFreeString((BSTR)wParam);
 	return 0;
 }
 

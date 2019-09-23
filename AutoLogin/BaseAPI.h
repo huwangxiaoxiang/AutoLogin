@@ -39,7 +39,7 @@ public:
 	void SetDefaultProcess(LPCTSTR className, LPCTSTR windowName);
 
 	//Ö´ÐÐ¿ØÖÆÌ¨ÃüÁî
-	void CMDCommand(LPTSTR command);
+	void CMDCommand(LPCTSTR command);
 
 private:
 	int TransformWidth(int);
