@@ -64,13 +64,9 @@ void Act::InputString(CString s)
 void Act::Start()
 {
 	ClearWindow();
-	//string tankPath = { 0 };
-	TCHAR DataDir[MAX_PATH];
-	int m = 0;
-	memset(DataDir, 0, sizeof(DataDir));
+	TCHAR DataDir[MAX_PATH] = { 0 };
 	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, DataDir))) {
 		PathAppend(DataDir, L"Tencent\\QQMicroGameBox\\坦克大战");
-		//tankPath=DataDir;
 	}
 	int result = (int)ShellExecute(NULL, L"open", DataDir, NULL, NULL, SW_SHOW);//打开主程序
 	if (result < 32)
