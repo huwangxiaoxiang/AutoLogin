@@ -4,11 +4,10 @@ using namespace std;
 class FileOp
 {
 private:
-	vector<Count> Number;
 	CString path;
 public:
-	FileOp(vector<Count> ,CString);
-	void Write();
+	FileOp(CString);
+	void Write(vector<Count>);
 	void Read(vector<Count> &);
 	~FileOp();
 };

@@ -277,8 +277,8 @@ void CAutoLoginDlg::OnBnClickedButton3()
 	}
 	else 
 	{
-	//FileOp* file=new FileOp(CountNumber, CString("e:\\now.bv"));
-	//file->Write();
+	FileOp* file=new FileOp(CString("e:\\now.bv"));
+	file->Write(CountNumber);
 	LogThread=AfxBeginThread(RUNTIME_CLASS(Thread1));
 	GetDlgItem(IDC_BUTTON2)->EnableWindow(0);
 	GetDlgItem(IDC_BUTTON5)->EnableWindow(0);
@@ -425,25 +425,24 @@ HBRUSH CAutoLoginDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 //读取列表
 void CAutoLoginDlg::OnBnClickedButton6()
 {
-	FileOp *file = new FileOp(CountNumber, CString("e:\\info.bv"));
+	FileOp *file = new FileOp(CString("e:\\info.bv"));
 	file->Read(CountNumber);
 	while (CountList.GetCount() != 0)
 		CountList.DeleteString(0);
 	for (vector<Count>::iterator index = CountNumber.begin(); index < CountNumber.end(); index++) {
 		CountList.AddString(index->GetNumber());
 	}
-	FileOp *filew = new FileOp(CountNumber, CString("e:\\now.bv"));
-	filew->Write();
+	FileOp *filew = new FileOp(CString("e:\\now.bv"));
+	filew->Write(CountNumber);
 	UpdateData(false);
-
 }
 
 
 void CAutoLoginDlg::OnBnClickedButton5()//保存列表
 {
 	
-	FileOp *file = new FileOp(CountNumber, CString("e:\\info.bv"));
-	file->Write();
+	FileOp *file = new FileOp(CString("e:\\info.bv"));
+	file->Write(CountNumber);
 	AfxMessageBox(CString("列表已保存！"));
 	delete file;
 }

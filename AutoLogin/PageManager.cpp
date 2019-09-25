@@ -64,6 +64,11 @@ void PageManager::Instance()
 	skillpage.setClose(486, -298, BASEP_CENTER);
 	pages.push_back(skillpage);
 
+	Page guide = Page(9, L"新手教程选车界面");
+	guide.addKeyPoint(KeyPoint(489, -218, 16777215, BASEP_CENTER));
+	guide.addKeyPoint(KeyPoint(60, 124, 1781988, BASEP_CENTER));
+	guide.setClose(489, -218, BASEP_CENTER);
+	pages.push_back(guide);
 
 }
 
@@ -81,9 +86,22 @@ std::wstring PageManager::ShowPageList()
 
 Page PageManager::isThisPage(int index,HWND process)
 {
+	if (process != NULL&&index!=-1) {
+		for (auto i = pages.cbegin(); i != pages.cend(); i++) {
+			Page ind = *i;
+			if (ind.getIndex() == index && ind.isThisPage(process)) {
+				return ind;
+			}
+		}
+	}
+	return Page(-1, L"无效Page");
+}
+
+Page PageManager::getPage(int pageIndex)
+{
 	for (auto i = pages.cbegin(); i != pages.cend(); i++) {
 		Page ind = *i;
-		if (ind.getIndex() == index&& ind.isThisPage(process)) {
+		if (ind.getIndex() == pageIndex) {
 			return ind;
 		}
 	}

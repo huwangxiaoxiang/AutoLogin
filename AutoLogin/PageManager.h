@@ -13,5 +13,6 @@ public:
 	static void Instance();
 	static std::wstring ShowPageList();
 	static Page isThisPage(int index,HWND process);
+	static Page getPage(int pageIndex);
 };
 

@@ -11,7 +11,7 @@ void Act::ClearWindow()
 void Act::InputString(CString s)
 {
 	for (int i = 0; i < s.GetLength(); i++) {
-		Sleep(100);
+		//Sleep(120);
 		int asc = s.GetAt(i);
 		if (asc >= 48 && asc <= 57) {//数字
 			KeyPress(asc);
@@ -86,18 +86,20 @@ void Act::Input()
 	MoveTo(rect.left + 172, rect.top + 291);
 	Sleep(20);
 	LeftClick(1);
+	Sleep(300);
 	InputString(Number.GetNumber());
-	Sleep(100);
+	Sleep(500);
 	
 	MoveTo(rect.left + 174, rect.top + 336);
 	Sleep(500);
 	LeftClick(1);
 	
+	Sleep(500);
 	InputString(Number.GetKey());
 	Sleep(500);
 	
 	MoveTo(rect.left + 499, rect.top + 346);
-	Sleep(20);
+	Sleep(100);
 	LeftClick(1);
 }
 
@@ -105,7 +107,6 @@ void Act::ChooseService(int ser)
 {
 	Sleep(7000);
 	RECT rect = getProcessRect(L"#32770", L"坦克大战登陆器");
-
 	switch (ser) {
 	case 0:
 		MoveTo(rect.left + 268, rect.top + 289);
@@ -142,33 +143,34 @@ void Act::ChooseService(int ser)
 
 void Act::prepare()
 {
-	Sleep(25000);
+	std::vector<int> pagelist;
+	pagelist.push_back(1);
+	pagelist.push_back(3);
+	pagelist.push_back(9);
+	Page page=waitPage(pagelist, L"UnityWndClass", L"Tank Battle", 25000);
 	BaseAPI api;
 	HWND tank = api.getProcessHWND(L"UnityWndClass", L"Tank Battle");
 	RECT client = api.getProcessClient(tank);
-	Page page = PageManager::isThisPage(3,tank);
-	if (page.getIndex()==3) {
-		POINT close = page.getClose(tank);
-		api.MoveTo(client.left + close.x , client.top + close.y);
-		api.LeftClick(1);
-		Sleep(1000);
-	}
+	Sleep(1000);
+	POINT close = page.getClose(tank);
+	api.MoveTo(client.left + close.x, client.top + close.y);
+	Sleep(300);
+	api.LeftClick(1);
+	Sleep(1000);
 	
 }
 
 void Act::getOnlineGift()
 {
-	Sleep(1000);
 	CRect rect = getProcessRect();
 	MoveTo(rect.right - 56, rect.top + 168);
 	Sleep(100);
 	LeftClick(1);
-	Sleep(1000);
+	Sleep(1500);
 }
 
 void Act::getOfflineExperience()
 {
-	Sleep(1000);
 	CRect rect = getProcessRect();
 	CPoint  center;
 	center.x = rect.left + (rect.right - rect.left) / 2;
@@ -182,14 +184,38 @@ void Act::getOfflineExperience()
 	LeftClick(1);
 	Sleep(400);
 	MoveTo(center.x + 506, center.y - 283);
+	Sleep(400);
 	LeftClick(1);
-	Sleep(1000);
+	Sleep(1500);
 }
 
 void Act::exit()
 {
 	ClearWindow();
 	Sleep(1000);
+}
+
+Page Act::waitPage(int page, LPTSTR className, LPTSTR windowName, int timeout)
+{
+	std::vector<int> list;
+	list.push_back(page);
+	return waitPage(list, className, windowName, timeout);
+}
+
+Page Act::waitPage(std::vector<int> page, LPTSTR className, LPTSTR windowName, int timeout)
+{
+	while (timeout >= 0) {
+		HWND hwnd = FindWindow(className, windowName);
+		for (auto i = page.cbegin(); i != page.cend(); i++) {
+			int index = *i;
+			Page temp = PageManager::isThisPage(index, hwnd);
+			if (temp.getIndex() == index)
+				return temp;
+		}
+		timeout -= 1000;
+		Sleep(1000);
+	}
+	return Page(-1, L"无效Page");
 }
 
 Act::Act(Count ser)

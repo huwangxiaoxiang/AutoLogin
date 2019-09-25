@@ -2,16 +2,15 @@
 #include "FileOp.h"
 
 
-FileOp::FileOp(vector<Count> number, CString path)
+FileOp::FileOp(CString path)
 {
-	Number = number;
 	this->path = path;
 }
 
 
-void FileOp::Write() {
+void FileOp::Write(vector<Count> number) {
 	std::wofstream da(path);
-	for (vector<Count>::iterator index = Number.begin(); index < Number.end(); index++){
+	for (vector<Count>::iterator index = number.begin(); index < number.end(); index++){
 		da << index->GetNumber().GetBuffer(0);
 		da << " ";
 		da << (index->GetKey().GetBuffer(0));

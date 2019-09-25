@@ -24,7 +24,7 @@ END_MESSAGE_MAP()
 
 void Thread1::run()
 {
-	FileOp num(numberlist, L"e:\\now.bv");
+	FileOp num(L"e:\\now.bv");
 	num.Read(numberlist);
 	CAutoLoginDlg* dlg = (CAutoLoginDlg*)GetMainWnd();
 	PageManager::Instance();
@@ -44,14 +44,14 @@ void Thread1::run()
 				now.Input();
 				Notify(2);
 				now.ChooseService(ser);
-				Notify(3);
+				Notify(3);/**/
 				now.prepare();
 				Notify(6);
 				now.getOnlineGift();
 				Notify(8);
 				now.getOfflineExperience();
 				Notify(4);
-				now.exit();
+				now.exit();/**/
 			}
 		}
 	}

@@ -24,5 +24,7 @@ public:
 	void getOnlineGift();
 	void getOfflineExperience();
 	void exit();
+	Page waitPage(int page, LPTSTR className,LPTSTR windowName, int timeout);
+	Page waitPage(std::vector<int> page, LPTSTR className, LPTSTR windowName, int timeout);
 };
 
