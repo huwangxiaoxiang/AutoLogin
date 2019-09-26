@@ -12,7 +12,7 @@ void showPix(KeyPoint point) {
 	BaseAPI api;
 	HWND tank = api.getProcessHWND("UnityWndClass", "Tank Battle");
 	RECT rect = api.getProcessClient(tank);
-	std::cout << "客户区左上角位置：(" << rect.left << "," << rect.top << ")" << std::endl;
+	std::cout << "客户区矩形：(" << rect.left << "," << rect.top << ") " << rect.right - rect.left << "x" << rect.bottom - rect.top << std::endl;
 
 	PixCollect col(3,3);
 	POINT offset = point.getXY(tank);
@@ -137,8 +137,13 @@ int main()
 	for (auto i = lists.cbegin(); i != lists.cend(); i++) {
 		showPix(*i);
 	}
-
+*/
 	int a, b, flag;
+	BaseAPI api;
+	HWND tank = api.getProcessHWND("UnityWndClass", "Tank Battle");
+	RECT rect = api.getProcessClient(tank);
+	std::cout << "客户区矩形：(" << rect.left << "," << rect.top << ") " << rect.right - rect.left << "x" << rect.bottom - rect.top << std::endl;
+
 	while (true) {
 		std::cin >> a;
 		std::cin >> b;
@@ -146,7 +151,7 @@ int main()
 		KeyPoint po(a, b, 0, flag);
 		showPix(po);
 	}
-	*/
+	
 	/*
 	int x1, y1, x2, y2;
 	int R, G, B;
@@ -158,7 +163,7 @@ int main()
 	while (true) {
 		HWND tank = api.getProcessHWND("UnityWndClass", "Tank Battle");
 		RECT rect = api.getProcessClient(tank);
-		std::cout << "客户区左上角位置：(" << rect.left << "," << rect.top << ")" << std::endl;
+		std::cout << "客户区矩形：(" << rect.left << "," << rect.top <<") " << rect.right-rect.left <<"x" <<rect.bottom-rect.top <<  std::endl;
 		std::cin >> x1>>y1;
 		std::cin >> x2>>y2;
 		std::cin >> R >> G >> B;
@@ -185,10 +190,6 @@ int main()
 	api.MoveTo(p.x,p.y);
 	Sleep(100);
 	api.LeftClick(service, 502,107);*/
-	
-	int result = (int)ShellExecute(NULL, L"open",L"C:\\Users\\12703\\AppData\\Roaming\\Tencent\\QQMicroGameBox\\坦克大战", NULL, NULL, SW_SHOW);//打开主程序
-	if (result < 32)
-		MessageBox(NULL, L"启动错误", NULL, NULL);
 	
 	return 0;
 }

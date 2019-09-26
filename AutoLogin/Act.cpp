@@ -163,7 +163,8 @@ void Act::prepare()
 void Act::getOnlineGift()
 {
 	CRect rect = getProcessRect();
-	MoveTo(rect.right - 56, rect.top + 168);
+	//MoveTo(rect.right - 56, rect.top + 168);
+	MoveTo(rect.right - 200, rect.top + 168);
 	Sleep(100);
 	LeftClick(1);
 	Sleep(1500);
