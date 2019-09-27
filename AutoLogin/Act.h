@@ -15,6 +15,8 @@ public:
 private:
 	void ClearWindow();
 	void InputString(CString s);
+	LPTSTR GameClass = L"UnityWndClass";
+	LPTSTR GameName = L"Tank Battle";
 
 public:
 	void Start();
@@ -26,5 +28,6 @@ public:
 	void exit();
 	Page waitPage(int page, LPTSTR className,LPTSTR windowName, int timeout);
 	Page waitPage(std::vector<int> page, LPTSTR className, LPTSTR windowName, int timeout);
+	void getSkill();
 };
 

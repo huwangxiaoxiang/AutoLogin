@@ -5,6 +5,7 @@ class BaseAPI
 public:
 	/*将鼠标移动至屏幕(x,y)位置*/
 	void MoveTo(int x, int y);
+	void MoveTo(POINT p);
 
 	//使用虚拟按钮的方式模拟鼠标点击count次
 	void LeftClick(int count);

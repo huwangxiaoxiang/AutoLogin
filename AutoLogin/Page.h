@@ -19,6 +19,7 @@ public:
 	void setClose(POINT close,int base_flag);
 	void setClose(int x, int y,int base_flag);
 	POINT getClose(HWND hwnd);
+	POINT getCloseAbsolute(HWND hwnd);
 
 	Page();
 	Page(int index,LPCTSTR name=L"");

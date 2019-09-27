@@ -20,6 +20,11 @@ void BaseAPI::MoveTo(int x, int y) {
 	mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, TransformWidth(x), TransformHeight(y), 0, 0);
 }
 
+void BaseAPI::MoveTo(POINT p)
+{
+	MoveTo(p.x, p.y);
+}
+
 void BaseAPI::LeftClick(int count) {
 	POINT pos;
 	GetCursorPos(&pos);

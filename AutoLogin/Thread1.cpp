@@ -44,12 +44,14 @@ void Thread1::run()
 				now.Input();
 				Notify(2);
 				now.ChooseService(ser);
-				Notify(3);/**/
+				Notify(3);
 				now.prepare();
 				Notify(6);
 				now.getOnlineGift();
 				Notify(8);
-				now.getOfflineExperience();
+				now.getOfflineExperience();/**/
+				Notify(9);
+				now.getSkill();
 				Notify(4);
 				now.exit();/**/
 			}

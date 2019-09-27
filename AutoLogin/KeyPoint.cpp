@@ -26,6 +26,16 @@ KeyPoint::KeyPoint(int x, int y, COLORREF color, int base_flag)
 
 }
 
+POINT KeyPoint::getAbsoluteXY(HWND hwnd)
+{
+	BaseAPI api;
+	POINT basepoint = getBasePoint(this->base_flag, hwnd);
+	RECT start = api.getProcessClient(hwnd);
+	basepoint.x = start.left+basepoint.x+this->point.x;
+	basepoint.y = start.top+basepoint.y+this->point.y;
+	return basepoint;
+}
+
 int KeyPoint::getX(HWND hwnd)
 {
 	POINT basepoint = getBasePoint(this->base_flag, hwnd);

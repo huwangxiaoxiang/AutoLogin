@@ -147,9 +147,9 @@ void Act::prepare()
 	pagelist.push_back(1);
 	pagelist.push_back(3);
 	pagelist.push_back(9);
-	Page page=waitPage(pagelist, L"UnityWndClass", L"Tank Battle", 25000);
+	Page page=waitPage(pagelist, this->GameClass, this->GameName, 25000);
 	BaseAPI api;
-	HWND tank = api.getProcessHWND(L"UnityWndClass", L"Tank Battle");
+	HWND tank = api.getProcessHWND(this->GameClass,this->GameName);
 	RECT client = api.getProcessClient(tank);
 	Sleep(1000);
 	POINT close = page.getClose(tank);
@@ -219,8 +219,43 @@ Page Act::waitPage(std::vector<int> page, LPTSTR className, LPTSTR windowName, i
 	return Page(-1, L"无效Page");
 }
 
+void Act::getSkill()
+{
+	Sleep(1000);
+	HWND hwnd = FindWindow(GameClass, GameName);
+	Page result = PageManager::isThisPage(5, hwnd);
+	BaseAPI api;
+	RECT client = api.getProcessClient(hwnd);
+	KeyPoint open(-235, -138, 0,BASEP_CENTER_BOTTOM);
+	if (result.getIndex() == 5) {
+		//打开技能页面
+		api.MoveTo(open.getAbsoluteXY(hwnd));
+		Sleep(400);
+		api.LeftClick(1);
+		Sleep(1500);
+
+		//点击抽取按钮
+		open=KeyPoint(125, 88, 0, BASEP_CENTER);
+		api.MoveTo(open.getAbsoluteXY(hwnd));
+		Sleep(400);
+		api.LeftClick(1);
+
+		//点击确定按钮
+		open = KeyPoint(-58, 44, 0, BASEP_CENTER);
+		api.MoveTo(open.getAbsoluteXY(hwnd));
+		Sleep(400);
+		api.LeftClick(1);
+
+		//关闭技能页面
+		open = KeyPoint(486, -298,0, BASEP_CENTER);
+		api.MoveTo(open.getAbsoluteXY(hwnd));
+		Sleep(400);
+		api.LeftClick(1);
+	}
+}
+
 Act::Act(Count ser)
 {
 	this->Number = ser;
-	this->SetDefaultProcess(L"UnityWndClass",L"Tank Battle");
+	this->SetDefaultProcess(GameClass,GameName);
 }

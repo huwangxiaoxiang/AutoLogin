@@ -34,6 +34,11 @@ POINT Page::getClose(HWND hwnd)
 	return close.getXY(hwnd);
 }
 
+POINT Page::getCloseAbsolute(HWND hwnd)
+{
+	return close.getAbsoluteXY(hwnd);
+}
+
 Page::Page()
 {
 	this->index = -1;
