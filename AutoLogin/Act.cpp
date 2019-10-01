@@ -141,23 +141,27 @@ void Act::ChooseService(int ser)
 	
 }
 
-void Act::prepare()
+BOOL Act::prepare()
 {
 	std::vector<int> pagelist;
 	pagelist.push_back(1);
 	pagelist.push_back(3);
 	pagelist.push_back(9);
 	Page page=waitPage(pagelist, this->GameClass, this->GameName, 25000);
+	if (page.getIndex() == -1) return FALSE;
 	BaseAPI api;
 	HWND tank = api.getProcessHWND(this->GameClass,this->GameName);
 	RECT client = api.getProcessClient(tank);
+	ActiveWindow(tank);
+	if (page.getIndex() != 1) {
+		Sleep(1000);
+		POINT close = page.getClose(tank);
+		api.MoveTo(client.left + close.x, client.top + close.y);
+		Sleep(300);
+		api.LeftClick(1);
+	}
 	Sleep(1000);
-	POINT close = page.getClose(tank);
-	api.MoveTo(client.left + close.x, client.top + close.y);
-	Sleep(300);
-	api.LeftClick(1);
-	Sleep(1000);
-	
+	return TRUE;
 }
 
 void Act::getOnlineGift()
@@ -187,7 +191,6 @@ void Act::getOfflineExperience()
 	MoveTo(center.x + 506, center.y - 283);
 	Sleep(400);
 	LeftClick(1);
-	Sleep(1500);
 }
 
 void Act::exit()
@@ -252,6 +255,52 @@ void Act::getSkill()
 		Sleep(400);
 		api.LeftClick(1);
 	}
+}
+
+Count Act::setIDKey(Count source)
+{
+	Sleep(5000);
+	HWND hwnd = getProcessHWND(L"#32770", L"坦克大战登陆器");
+	DWORD pid;
+	GetWindowThreadProcessId(hwnd, &pid);
+	LPTSTR cmd = getProcCMD(pid);
+	CString target(cmd);
+	int pos1 = target.Find(L"ID=", 0);
+	int pos2 = target.Find(L"Key=", 0);
+	int pos3 = target.Find(L"ModelID=", 0);
+	CString temp1 = target.Mid(pos1 + 3, 32);
+	CString temp2 = target.Mid(pos2 + 4, 32);
+	LPTSTR id = new TCHAR[temp1.GetLength() + 1];
+	LPTSTR key = new TCHAR[temp2.GetLength() + 1];
+	lstrcpy(id, temp1);
+	lstrcpy(key, temp2);
+	source.setID(id);
+	source.setPriKey(key);
+
+	return source;
+}
+
+BOOL Act::startDirect(LPTSTR ID, LPTSTR key, int serverID)
+{
+	ClearWindow();
+	Sleep(1000);
+	TCHAR DataDir[MAX_PATH];
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, 0, DataDir))) {
+		lstrcat(DataDir, L"\\tkdz\\Tank.exe ID:");
+		lstrcat(DataDir, ID);
+		lstrcat(DataDir,L",Key:");
+		lstrcat(DataDir, key);
+		lstrcat(DataDir, L",PID:10,serverId:");
+		CString s;
+		s.Format(L"%d", serverID + 1);
+		lstrcat(DataDir, s.GetBuffer());
+	}
+	//this->CMDCommand(DataDir);//打开主程序;
+	STARTUPINFO si = { sizeof(si) };
+	PROCESS_INFORMATION pi;
+	BOOL tank = CreateProcess(NULL, DataDir, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+	Sleep(1000);
+	return tank;
 }
 
 Act::Act(Count ser)

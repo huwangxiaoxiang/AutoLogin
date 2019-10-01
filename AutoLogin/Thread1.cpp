@@ -30,22 +30,32 @@ void Thread1::run()
 	PageManager::Instance();
 	for (vector<Count>::iterator beg = numberlist.begin(); beg != numberlist.end(); beg++)
 	{
-		
 		Count now_count = *beg;
+		int retry_times = 5;//失败时重新尝试的次数
 		Act now(*beg);
 		BOOL* cservice = now.Number.GetService();
 		for (int ser = 0; ser <7; ser++)
 		{
 			dlg->PostMessage(UPDATE_COUNTS, (WPARAM)now_count.GetNumber().AllocSysString(), ser);
 			if (cservice[ser]) {
-				Notify(0);
-				now.Start();
-				Notify(1);
-				now.Input();
-				Notify(2);
-				now.ChooseService(ser);
+				if (now_count.getID() == NULL || now_count.getPriKey() == NULL) {
+					Notify(0);
+					now.Start();
+					Notify(1);
+					now.Input();
+					//Notify(2);
+					//now.ChooseService(ser);
+					now_count=now.setIDKey(now_count);
+				}
+
 				Notify(3);
-				now.prepare();
+				BOOL start=now.startDirect(now_count.getID(), now_count.getPriKey(), ser);
+				if (!start && retry_times > 0) { ser--; retry_times--; now_count.setID(NULL); continue; }
+				if (retry_times <= 0) break;
+				BOOL pre=now.prepare();
+				if(!pre&& retry_times > 0) { ser--; retry_times--;  now_count.setID(NULL); continue; }
+				if (retry_times <= 0) break;
+
 				Notify(6);
 				now.getOnlineGift();
 				Notify(8);

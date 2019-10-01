@@ -4,6 +4,8 @@
 
 Count::Count()
 {
+	this->ID = NULL;
+	this->priKey = NULL;
 }
 
 
@@ -15,6 +17,8 @@ Count::Count(CString Count, CString key, BOOL s0, BOOL s1, BOOL s2, BOOL s3, BOO
 	this->SetNumber(Count);
 	this->SetKey(key);
 	this->SetService(s0, s1, s2, s3, s4, s5, s6);
+	this->ID = NULL;
+	this->priKey = NULL;
 }
 
 void Count:: SetNumber(CString number) {
@@ -37,4 +41,24 @@ void Count::SetService(BOOL s0,BOOL s1, BOOL s2, BOOL s3, BOOL s4, BOOL s5, BOOL
 	Service[4] = s4;
 	Service[5] = s5;
 	Service[6] = s6;
+}
+
+void Count::setID(LPTSTR id)
+{
+	this->ID = id;
+}
+
+void Count::setPriKey(LPTSTR priKey)
+{
+	this->priKey = priKey;
+}
+
+LPTSTR Count::getID()
+{
+	return this->ID;
+}
+
+LPTSTR Count::getPriKey()
+{
+	return this->priKey;
 }

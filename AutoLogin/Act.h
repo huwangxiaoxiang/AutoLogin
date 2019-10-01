@@ -22,12 +22,15 @@ public:
 	void Start();
 	void Input();
 	void ChooseService(int ser);
-	void prepare();
+	BOOL prepare();
 	void getOnlineGift();
 	void getOfflineExperience();
 	void exit();
 	Page waitPage(int page, LPTSTR className,LPTSTR windowName, int timeout);
 	Page waitPage(std::vector<int> page, LPTSTR className, LPTSTR windowName, int timeout);
 	void getSkill();
+
+	Count setIDKey(Count source);
+	BOOL startDirect(LPTSTR ID,LPTSTR key,int serverID);
 };
 

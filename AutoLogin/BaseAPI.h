@@ -1,5 +1,11 @@
 #pragma once
 #include <Windows.h>
+#include "winternl.h"
+#include <bcrypt.h>
+#include <Shlwapi.h>
+
+typedef NTSTATUS(WINAPI* NtQueryInformationProcessFake)(HANDLE, DWORD, PVOID, ULONG, PULONG);
+
 class BaseAPI
 {
 public:
@@ -41,6 +47,9 @@ public:
 
 	//执行控制台命令
 	void CMDCommand(LPCTSTR command);
+
+	//获取进程输入参数
+	LPTSTR getProcCMD(WORD pid);
 
 private:
 	int TransformWidth(int);
