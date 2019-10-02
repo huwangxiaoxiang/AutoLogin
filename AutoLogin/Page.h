@@ -5,7 +5,7 @@
 #include "PixCollect.h"
 class Page
 {
-private:
+protected:
 	int index;//页面标识
 	std::vector<KeyPoint> keypoints;//页面关键点及其颜色
 	LPCTSTR name;

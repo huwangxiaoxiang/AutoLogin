@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Act.h"
+#include "SysGiftPage.h"
 
 void Act::ClearWindow()
 {
@@ -147,15 +148,15 @@ BOOL Act::prepare()
 	pagelist.push_back(1);
 	pagelist.push_back(3);
 	pagelist.push_back(9);
-	Page page=waitPage(pagelist, this->GameClass, this->GameName, 25000);
-	if (page.getIndex() == -1) return FALSE;
+	Page* page=waitPage(pagelist, this->GameClass, this->GameName, 25000);
+	if (page->getIndex() == -1) return FALSE;
 	BaseAPI api;
 	HWND tank = api.getProcessHWND(this->GameClass,this->GameName);
 	RECT client = api.getProcessClient(tank);
 	ActiveWindow(tank);
-	if (page.getIndex() != 1) {
+	if (page->getIndex() != 1) {
 		Sleep(1000);
-		POINT close = page.getClose(tank);
+		POINT close = page->getClose(tank);
 		api.MoveTo(client.left + close.x, client.top + close.y);
 		Sleep(300);
 		api.LeftClick(1);
@@ -193,44 +194,80 @@ void Act::getOfflineExperience()
 	LeftClick(1);
 }
 
+void Act::getSysGift()
+{
+	Sleep(1000);
+	HWND hwnd = this->getProcessHWND();
+	ActiveWindow(hwnd);
+	CRect rect = getProcessClient(hwnd);
+	this->MoveTo(rect.right - 278, rect.top + 121);
+	Sleep(400);
+	this->MoveTo(rect.right - 270, rect.top + 209);
+	Sleep(400);
+	this->LeftClick(1);
+	Sleep(1000);
+	Page* page =PageManager::isThisPage(10, hwnd);
+	if (page->getIndex() == -1)
+		return;
+	SysGiftPage* p = (SysGiftPage*)page;
+	while (p->has_gift(hwnd)) {
+		this->MoveTo(p->look_point.getAbsoluteXY(hwnd));//领取
+		Sleep(200);
+		this->LeftClick(1);
+		Sleep(400);
+		this->MoveTo(p->affirm.getAbsoluteXY(hwnd));//确认
+		Sleep(200);
+		this->LeftClick(1);
+		Sleep(400);
+		this->MoveTo(p->close_result.getAbsoluteXY(hwnd));//关闭
+		Sleep(200);
+		this->LeftClick(1);
+		Sleep(400);
+	}
+	this->MoveTo(p->getCloseAbsolute(hwnd));
+	Sleep(200);
+	this->LeftClick(1);
+	Sleep(1000);
+}
+
 void Act::exit()
 {
 	ClearWindow();
 	Sleep(1000);
 }
 
-Page Act::waitPage(int page, LPTSTR className, LPTSTR windowName, int timeout)
+Page* Act::waitPage(int page, LPTSTR className, LPTSTR windowName, int timeout)
 {
 	std::vector<int> list;
 	list.push_back(page);
 	return waitPage(list, className, windowName, timeout);
 }
 
-Page Act::waitPage(std::vector<int> page, LPTSTR className, LPTSTR windowName, int timeout)
+Page* Act::waitPage(std::vector<int> page, LPTSTR className, LPTSTR windowName, int timeout)
 {
 	while (timeout >= 0) {
 		HWND hwnd = FindWindow(className, windowName);
 		for (auto i = page.cbegin(); i != page.cend(); i++) {
 			int index = *i;
-			Page temp = PageManager::isThisPage(index, hwnd);
-			if (temp.getIndex() == index)
+			Page* temp = PageManager::isThisPage(index, hwnd);
+			if (temp->getIndex() == index)
 				return temp;
 		}
 		timeout -= 1000;
 		Sleep(1000);
 	}
-	return Page(-1, L"无效Page");
+	return new Page(-1, L"无效Page");
 }
 
 void Act::getSkill()
 {
 	Sleep(1000);
 	HWND hwnd = FindWindow(GameClass, GameName);
-	Page result = PageManager::isThisPage(5, hwnd);
+	Page* result = PageManager::isThisPage(5, hwnd);
 	BaseAPI api;
 	RECT client = api.getProcessClient(hwnd);
 	KeyPoint open(-235, -138, 0,BASEP_CENTER_BOTTOM);
-	if (result.getIndex() == 5) {
+	if (result->getIndex() == 5) {
 		//打开技能页面
 		api.MoveTo(open.getAbsoluteXY(hwnd));
 		Sleep(400);

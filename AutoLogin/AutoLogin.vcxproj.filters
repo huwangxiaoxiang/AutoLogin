@@ -66,6 +66,9 @@
     <ClInclude Include="Page.h">
       <Filter>头文件\page</Filter>
     </ClInclude>
+    <ClInclude Include="SysGiftPage.h">
+      <Filter>头文件\page</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AutoLogin.cpp">
@@ -102,6 +105,9 @@
       <Filter>源文件\page</Filter>
     </ClCompile>
     <ClCompile Include="Page.cpp">
+      <Filter>源文件\page</Filter>
+    </ClCompile>
+    <ClCompile Include="SysGiftPage.cpp">
       <Filter>源文件\page</Filter>
     </ClCompile>
   </ItemGroup>

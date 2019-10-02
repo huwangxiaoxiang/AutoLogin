@@ -179,6 +179,9 @@ LRESULT CAutoLoginDlg::OnUpdateState(WPARAM wParam, LPARAM lParam)
 	case 9:
 		this->state_text = L"免费抽取技能...";
 		break;
+	case 10:
+		this->state_text = L"领取系统礼包...";
+		break;
 	default:
 		this->state_text = L"";
 		break;

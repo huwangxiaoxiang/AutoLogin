@@ -1,6 +1,6 @@
 #pragma once
 #include <Windows.h>
-#include "BaseAPI.h"
+
 #define BASEP_LEFT_TOP 1
 #define BASEP_RIGHT_TOP 2
 #define BASEP_LEFT_BOTTOM 3

@@ -59,11 +59,14 @@ void Thread1::run()
 				Notify(6);
 				now.getOnlineGift();
 				Notify(8);
-				now.getOfflineExperience();/**/
+				now.getOfflineExperience();
 				Notify(9);
 				now.getSkill();
+				Notify(10);
+				now.getSysGift();
 				Notify(4);
 				now.exit();/**/
+				
 			}
 		}
 	}
