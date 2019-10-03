@@ -263,11 +263,11 @@ void Act::getSkill()
 {
 	Sleep(1000);
 	HWND hwnd = FindWindow(GameClass, GameName);
-	Page* result = PageManager::isThisPage(5, hwnd);
+	Page* result = PageManager::isThisPage(4, hwnd);
 	BaseAPI api;
 	RECT client = api.getProcessClient(hwnd);
 	KeyPoint open(-235, -138, 0,BASEP_CENTER_BOTTOM);
-	if (result->getIndex() == 5) {
+	if (result->getIndex() == 4) {
 		//打开技能页面
 		api.MoveTo(open.getAbsoluteXY(hwnd));
 		Sleep(400);
