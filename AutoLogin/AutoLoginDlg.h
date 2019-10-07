@@ -60,7 +60,7 @@ private:
 	BOOL e3;
 	BOOL n1;
 
-	CString services[7] = { CString("华南一区"),CString("华南二区"),CString("华南三区"),CString("华东一区"),CString("华东二区"),CString("华东三区"),CString("华北一区") };
+	CString services[7] = { CString("华南一区"),CString("华东一区"),CString("华东二区"),CString("华南二区"),CString("华北一区"),CString("华东三区"),CString("华南三区") };
 	HMODULE keybordDll = NULL;
 	StartHook startHook;
 	ExitHook exitHook;
