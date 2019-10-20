@@ -11,7 +11,7 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-
+typedef void(*Send)(LPTSTR);
 
 // CGUITestDlg 对话框
 
@@ -28,6 +28,8 @@ void CGUITestDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_STATIC1, Pos);
+	DDX_Control(pDX, IDC_EDIT1, infos);
+	DDX_Control(pDX, IDC_LIST2, messages);
 }
 
 BEGIN_MESSAGE_MAP(CGUITestDlg, CDialogEx)
@@ -35,6 +37,9 @@ BEGIN_MESSAGE_MAP(CGUITestDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONDOWN()
+	ON_MESSAGE(WM_USER + 1, &CGUITestDlg::OnMessageRecv)
+	ON_WM_COPYDATA()
+	ON_BN_CLICKED(IDOK, &CGUITestDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 
@@ -110,4 +115,36 @@ void CGUITestDlg::OnLButtonDown(UINT nFlags, CPoint point)
 	this->Pos.Format(L"点击消息位置:%d,%d", point.x, point.y);
 	UpdateData(false);
 	CDialogEx::OnLButtonDown(nFlags, point);
+}
+
+
+afx_msg LRESULT CGUITestDlg::OnMessageRecv(WPARAM wParam, LPARAM lParam)
+{
+	CString m;
+	infos.GetWindowText(m);
+	m.AppendFormat(L"\n%s", wParam);
+	return 0;
+}
+
+
+BOOL CGUITestDlg::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
+{
+	CString wParam = (LPCTSTR)(pCopyDataStruct->lpData);
+	CString m;
+	infos.GetWindowText(m);
+	m.AppendFormat(L"\n%s", wParam);
+	infos.SetWindowText(m);
+	messages.AddString(wParam);
+
+	return CDialogEx::OnCopyData(pWnd, pCopyDataStruct);
+}
+
+
+void CGUITestDlg::OnBnClickedOk()
+{
+	HINSTANCE hDLL;
+	Send sendMessage;
+	hDLL = LoadLibrary(L"KeyBoardHook.dll");//加载动态链接库MyDll.dll文件；
+	sendMessage = (Send)GetProcAddress(hDLL, "ReportMessage");
+	sendMessage(L"Hello World");
 }

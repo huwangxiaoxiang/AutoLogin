@@ -34,4 +34,11 @@ public:
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	CString Pos;
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	CEdit infos;
+protected:
+	afx_msg LRESULT OnMessageRecv(WPARAM wParam, LPARAM lParam);
+public:
+	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
+	afx_msg void OnBnClickedOk();
+	CListBox messages;
 };

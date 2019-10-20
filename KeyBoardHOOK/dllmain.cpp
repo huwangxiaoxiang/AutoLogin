@@ -58,6 +58,22 @@ void Exit_() {
 	UnhookWindowsHookEx(hook);
 }
 
+extern "C" _declspec(dllexport)
+void ReportMessage(LPWSTR message) {
+	/**/HWND window= FindWindow(L"#32770",L"GUITest");
+	if (!window)
+		return;
+	COPYDATASTRUCT cds;
+	cds.dwData = 0;
+	cds.cbData = (lstrlen(message) + 1) * sizeof(WCHAR);
+	cds.lpData = _malloca(cds.cbData);
+	if (cds.lpData == 0)
+		return;
+	lstrcpy((LPTSTR)cds.lpData, message);
+	SendMessage(window, WM_COPYDATA, 0, (LPARAM)&cds);
+	
+}
+
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved

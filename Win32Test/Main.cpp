@@ -3,6 +3,8 @@
 #include <Shlwapi.h>
 #include "winternl.h"
 #include <Shlobj.h>
+#include "BaseAPI.h"
+
 
 typedef NTSTATUS(WINAPI* NtQueryInformationProcessFake)(HANDLE, DWORD, PVOID, ULONG, PULONG);
 
@@ -56,9 +58,26 @@ int main() {
 		wcout << "OK" << endl;
 		wcout << L"进程ID ：" << pi.dwProcessId << L"线程ID：" << pi.dwThreadId << endl;
 	}*/
+	BaseAPI api;
+	//HWND h = api.getProcessHWND(L"UnityWndClass", L"Tank Battle");
+	//SetForegroundWindow(h);
+	Sleep(2000);
+	std::cout << "开始模拟..." << endl;
+	//api.KeyDown(87);
+	//Sleep(3000);
+	//api.KeyUp(87);
+	POINT pos;
+	GetCursorPos(&pos);
+	int times = 0;
+	int delta = 20;
+	for (int i = 0; i < 200; i++,times++) {
+		times = times % 50;
+		if (times == 0) delta = -delta;
+		mouse_event(MOUSEEVENTF_MOVE, delta, 0, 0, 0);
+		Sleep(20);
+	}
 
+	std::cout << "模拟结束" << endl;
 	
-
-	std::wcout << getProcCMD(12532);
 	return 0;
 }

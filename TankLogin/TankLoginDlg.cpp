@@ -43,6 +43,9 @@ BEGIN_MESSAGE_MAP(TankLoginDlg, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COUNT, &TankLoginDlg::OnChangeCount)
 	ON_CBN_EDITCHANGE(IDC_COUNT, &TankLoginDlg::OnCountEdit)
 	ON_BN_CLICKED(IDC_REM, &TankLoginDlg::OnBnClickedRem)
+	ON_BN_CLICKED(IDC_BUTTON1, &TankLoginDlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON2, &TankLoginDlg::OnBnClickedButton2)
+	ON_BN_CLICKED(IDC_BUTTON3, &TankLoginDlg::OnBnClickedButton3)
 END_MESSAGE_MAP()
 
 
@@ -181,6 +184,12 @@ void TankLoginDlg::OnCountEdit()
 }
 
 void TankLoginDlg::ClearWindow()
+{
+	BaseAPI api;
+	api.CMDCommand(L"taskkill /im Launcher.exe /im QQMicroGameBox.exe /im  QQMicroGameBoxTray.exe /f");
+}
+
+void TankLoginDlg::ClearGame()
 {
 	BaseAPI api;
 	api.CMDCommand(L"taskkill /im Launcher.exe /im QQMicroGameBox.exe /im  QQMicroGameBoxTray.exe /im Tank.exe /f");
@@ -336,27 +345,54 @@ BOOL TankLoginDlg::startDirect(LPTSTR ID, LPTSTR key, int serverID)
 	//this->CMDCommand(DataDir);//打开主程序;
 	ifstream f(copy);
 	ifstream p(target);
+	STARTUPINFO si = { sizeof(si) };
+	PROCESS_INFORMATION pi;
 	if (f.good()&&p.good()) {
 		f.close();
 		p.close();
+		
+		time_t now = time(0);
+		TCHAR times_path[MAX_PATH] = { 0 };
 		TCHAR temp[MAX_PATH] = { 0 };
+		FILETIME ft1, ft2;
+
+		_stprintf_s(times_path, L"%sAssembly%d.dll", dll_path, now);
+		HANDLE hFile1 = CreateFile(target, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		HANDLE hFile2 = CreateFile(copy, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		
+		GetFileTime(hFile1, NULL, NULL, &ft1);
+		GetFileTime(hFile2, NULL, NULL, &ft2);
+		CloseHandle(hFile1);
+		CloseHandle(hFile2);
+		if (ft1.dwHighDateTime > ft2.dwHighDateTime || (ft1.dwHighDateTime == ft2.dwHighDateTime && ft1.dwLowDateTime > ft2.dwLowDateTime)) {
+			_trename(copy, times_path);
+			CopyFile(target, copy,false);
+			BOOL tank = CreateProcess(NULL, DataDir, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+			return tank;
+		}
+		
 		lstrcat(temp, dll_path);
 		lstrcat(temp, L"temp");
 		_trename(target, temp);
 		_trename(copy, target);
-		STARTUPINFO si = { sizeof(si) };
-		PROCESS_INFORMATION pi;
+
 		BOOL tank = CreateProcess(NULL, DataDir, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 		Sleep(2000);
 		_trename(target,copy);
 		_trename(temp,target);
 		return tank;
 	}
-	else {
-		STARTUPINFO si = { sizeof(si) };
-		PROCESS_INFORMATION pi;
+	else if(p.good()&&!f.good()){
+		f.close();
+		p.close();
+		CopyFile(target, copy,true);
 		BOOL tank = CreateProcess(NULL, DataDir, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
-		Sleep(1000);
+		return tank;
+	}
+	else {
+		f.close();
+		p.close();
+		BOOL tank = CreateProcess(NULL, DataDir, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 		return tank;
 	}
 
@@ -366,4 +402,26 @@ BOOL TankLoginDlg::startDirect(LPTSTR ID, LPTSTR key, int serverID)
 
 void TankLoginDlg::OnBnClickedRem()
 {
+}
+
+//普通登录
+void TankLoginDlg::OnBnClickedButton1()
+{
+	ClearGame();
+	Start();
+	TankLoginDlg::OnOK();
+}
+
+
+void TankLoginDlg::OnBnClickedButton2()
+{
+	TankLoginDlg::OnOK();
+}
+
+
+void TankLoginDlg::OnBnClickedButton3()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	Start();
+	
 }
