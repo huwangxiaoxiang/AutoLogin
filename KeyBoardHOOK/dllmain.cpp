@@ -5,10 +5,24 @@
 #include <sstream>
 
 #define PAUSE WM_USER+4
+#define EVENT 30000
 HHOOK hook=NULL;
 HWND hwnd=NULL;
 HINSTANCE   g_hInstance = NULL;
 int m = 12;
+HANDLE sending = NULL;
+volatile bool sending_exit = false;
+//LPWSTR* messes=new LPWSTR[100];
+LPWSTR messes[100];
+int flags[100] = { 0 };
+HANDLE have_source;//已经存在多少资源
+HANDLE remain_source;//剩余多少资源
+volatile int in_index=0;
+volatile int out_index=0;
+HANDLE  mutex_in;
+HANDLE mutex_out;
+CRITICAL_SECTION sec;
+
 
 
 void log(std::string s) {
@@ -60,19 +74,80 @@ void Exit_() {
 
 extern "C" _declspec(dllexport)
 void ReportMessage(LPWSTR message) {
-	/**/HWND window= FindWindow(L"#32770",L"GUITest");
-	if (!window)
+	DWORD dw=WaitForSingleObject(remain_source, 300);
+	if (dw != WAIT_OBJECT_0)
 		return;
-	COPYDATASTRUCT cds;
-	cds.dwData = 0;
-	cds.cbData = (lstrlen(message) + 1) * sizeof(WCHAR);
-	cds.lpData = _malloca(cds.cbData);
-	if (cds.lpData == 0)
-		return;
-	lstrcpy((LPTSTR)cds.lpData, message);
-	SendMessage(window, WM_COPYDATA, 0, (LPARAM)&cds);
-	
+
+	EnterCriticalSection(&sec);
+	LPWSTR temp = new WCHAR[lstrlen(message)];
+	lstrcpy(temp, message);
+	messes[in_index ] = temp;
+	in_index = (in_index + 1) % 100;
+	LeaveCriticalSection(&sec);
+
+	ReleaseSemaphore(have_source, 1, NULL);
 }
+
+extern "C" _declspec(dllexport)
+void ReportMessageF(LPWSTR message,int flag) {
+	DWORD dw = WaitForSingleObject(remain_source, 300);
+	if (dw != WAIT_OBJECT_0)
+		return;
+
+	EnterCriticalSection(&sec);
+	LPWSTR temp = new WCHAR[lstrlen(message)];
+	lstrcpy(temp, message);
+	messes[in_index] = temp;
+	flags[in_index] = flag;
+	in_index = (in_index + 1) % 100;
+	LeaveCriticalSection(&sec);
+
+	ReleaseSemaphore(have_source, 1, NULL);
+}
+
+HWND findWindow() {
+	HWND window = FindWindow(L"WindowsForms10.Window.8.app.0.141b42a_r6_ad1", L"TankFlow");
+	if (!window) {
+		window = FindWindow(L"WindowsForms10.Window.8.app.0.141b42a_r8_ad1", L"TankFlow");
+		if (!window)
+			return NULL;
+	}
+	return window;
+}
+
+extern "C" _declspec(dllexport)
+void NotifyMessage(int flag) {
+	HWND window = findWindow();
+	PostMessage(window, EVENT, 0, flag);
+}
+
+
+
+DWORD WINAPI sendThread(PVOID pvParam) {
+	DWORD dwResult = 0;
+	HWND window;
+	while (sending_exit == false) {
+		WaitForSingleObject(have_source, INFINITE);
+		window = findWindow();
+		COPYDATASTRUCT cds;
+		cds.dwData = 0;
+		cds.cbData = (lstrlen(messes[out_index])) * sizeof(WCHAR);
+		cds.lpData = _malloca(cds.cbData);
+		if (cds.lpData != 0) {
+			lstrcpy((LPTSTR)cds.lpData, messes[out_index]);
+			int result=SendMessage(window, WM_COPYDATA, flags[out_index], (LPARAM)& cds);
+			
+				
+		}
+		ReleaseSemaphore(remain_source,1,NULL);
+		WaitForSingleObject(&mutex_out,INFINITE);
+		out_index = (out_index + 1) % 100;
+		ReleaseMutex(&mutex_out);
+	}
+	return (dwResult);
+}
+
+
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -80,18 +155,27 @@ BOOL APIENTRY DllMain( HMODULE hModule,
                      )
 {
 	g_hInstance = (HINSTANCE)hModule;
+	DWORD sendid = 0;
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
 		//log("process attach");
+		have_source = CreateSemaphore(NULL, 0, 100, NULL);
+		remain_source = CreateSemaphore(NULL, 100, 100, NULL);
+		mutex_in = CreateMutex(NULL, TRUE, L"mutex_in");
+		mutex_out = CreateMutex(NULL, FALSE, L"muex_out");
+		InitializeCriticalSection(&sec);
+		sending = CreateThread(NULL, 0, sendThread, NULL,0,&sendid);
 		break;
     case DLL_THREAD_ATTACH:
 		//log("thread attach");
+		
 		break;
     case DLL_THREAD_DETACH:
 		//log("thread detach");
 		break;
     case DLL_PROCESS_DETACH:
+		sending_exit = true;
 		//log("process detach");
         break;
     }

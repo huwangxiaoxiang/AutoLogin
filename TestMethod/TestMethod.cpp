@@ -9,6 +9,8 @@
 #include <tchar.h>
 #include <conio.h>
 #include <Windows.h>
+#include <time.h>
+#pragma comment(lib,"G:\\C++\\AutoLogin\\Debug\\KeyBoardHOOK.lib")
 
 void showPix(KeyPoint point) {
 	BaseAPI api;
@@ -65,12 +67,40 @@ void DlgFind() {
 	EnumChildWindows(NULL,EnumChildProc, 0);
 }
 
+typedef BOOL(*StartHook)(HWND hwnd);
+typedef void (*ExitHook)();
+typedef void (*ReportMessage)(LPWSTR str);
+HMODULE keybordDll = NULL;
+ReportMessage reportMessage;
+
+int count = 0;
+
+DWORD WINAPI thread_func(LPVOID lpvoid) {
+	int s = (int)lpvoid;
+	Sleep(300);
+	WCHAR m[20];
+	_itow_s(s, m, 20, 10);
+	reportMessage(m);
+	return 0;
+}
+
+HWND findWindow() {
+	HWND window = FindWindow(L"WindowsForms10.Window.8.app.0.141b42a_r6_ad1", L"TankFlow");
+	if (!window) {
+		window = FindWindow(L"WindowsForms10.Window.8.app.0.141b42a_r8_ad1", L"TankFlow");
+		if (!window)
+			return NULL;
+	}
+	return window;
+}
+
 int main()
 {
-	Sleep(3000);
+	//Sleep(3000);
+	BaseAPI api;
 	//DlgFind();
 	//HANDLE hWnd = OpenProcess(NULL, TRUE, 13184);
-	TCHAR temp1[MAX_PATH], temp2[MAX_PATH];
+	/*TCHAR temp1[MAX_PATH], temp2[MAX_PATH];
 	HWND hwnd = GetFocus();
 	::GetClassName(hwnd, temp1, MAX_PATH);
 	::GetWindowText(hwnd, temp2, MAX_PATH);
@@ -82,7 +112,57 @@ int main()
 	::GetWindowText(hwnd2, temp4, MAX_PATH);
 
 	std::wcout << temp1 << " " << temp2 << std::endl;
-	Sleep(20000);
+	Sleep(20000);*/
+
+	/*keybordDll = LoadLibrary(L"G:\\C++\\AutoLogin\\Release\\KeyBoardHOOK.dll");
+	HANDLE th;
+	if (keybordDll == NULL) {
+		std::cout << ("DLL加载失败") << std::endl;
+	}
+	else {
+		reportMessage = (ReportMessage)GetProcAddress(keybordDll, "ReportMessage");
+		if (reportMessage == NULL) {
+			std::cout << "reportMessage函数加载失败" << std::endl;
+			Sleep(3000);
+			return 0;
+		}
+		clock_t start, end;
+		start = clock();
+		for (int i = 0; i < 100; i++) {
+			DWORD id = 0;
+			CreateThread(NULL, 0, thread_func, (LPVOID)count, 0, &id);
+			Sleep(1000);
+			count++;
+		}
+		end = clock();
+		std::cout << "结束发送时间：" << end-start << std::endl;
+
+	}
+
+
+	//HWND hwnd = api.getProcessHWND("WindowsForms10.Window.8.app.0.141b42a_r6_ad1", "TankFlow");
+	HWND hwnd = findWindow();
+	RECT rect= api.getProcessRect(hwnd);
+*/
+
+	HWND h4=0, h5=0, h6=0;
+	for (int i = 0; i < 2000; i++) {
+		HWND h1 = GetForegroundWindow();
+		HWND h2 = GetTopWindow(h1);
+		HWND h3 = api.getProcessHWND("UnityWndClass", "Tank Battle");
+		if (h4 == h1 && h5 == h2 && h6 == h3) {}
+		else {
+			std::cout << "forge:" << h1 << " top:" << h2 << " tank:" << h3 << std::endl;
+			h4 = h1;
+			h5 = h2;
+			h6 = h3;
+		}
+
+		Sleep(1000);
+	}
+
+	Sleep(30000);
+
 	return 0;
 }
 

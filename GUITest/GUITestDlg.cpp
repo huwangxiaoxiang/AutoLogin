@@ -8,10 +8,12 @@
 #include "GUITestDlg.h"
 #include "afxdialogex.h"
 
+
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-typedef void(*Send)(LPTSTR);
+typedef void(*Send)(byte[]);
 
 // CGUITestDlg 对话框
 
@@ -40,6 +42,7 @@ BEGIN_MESSAGE_MAP(CGUITestDlg, CDialogEx)
 	ON_MESSAGE(WM_USER + 1, &CGUITestDlg::OnMessageRecv)
 	ON_WM_COPYDATA()
 	ON_BN_CLICKED(IDOK, &CGUITestDlg::OnBnClickedOk)
+	ON_BN_CLICKED(IDC_BUTTON1, &CGUITestDlg::OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 
@@ -56,6 +59,22 @@ BOOL CGUITestDlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 	SetWindowText(L"GUITest");
+	/*
+	redisContext* c = redisConnect("47.101.70.188", 6379);
+	if (c == NULL || c->err) {
+		if (c) {
+			printf("Error: %s\n", c->errstr);
+			// handle error
+		}
+		else {
+			printf("Can't allocate redis context\n");
+		}
+	}
+	redisReply* reply;
+	reply = (redisReply*)redisCommand(c, "SET foo bar");
+	//printf("PING: %s\n", reply->str);
+	freeReplyObject(reply);*/
+
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -134,7 +153,8 @@ BOOL CGUITestDlg::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	infos.GetWindowText(m);
 	m.AppendFormat(L"\n%s", wParam);
 	infos.SetWindowText(m);
-	messages.AddString(wParam);
+	//messages.AddString(wParam);
+	messages.InsertString(0, wParam);
 
 	return CDialogEx::OnCopyData(pWnd, pCopyDataStruct);
 }
@@ -142,9 +162,31 @@ BOOL CGUITestDlg::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 
 void CGUITestDlg::OnBnClickedOk()
 {
-	HINSTANCE hDLL;
+	
+	infos.SetWindowTextW(L"");
+	while (messages.GetCount() > 0) {
+		messages.DeleteString(0);
+	}
+	
+}
+
+
+void CGUITestDlg::OnBnClickedButton1()
+{
+
+	/*HINSTANCE hDLL;
 	Send sendMessage;
-	hDLL = LoadLibrary(L"KeyBoardHook.dll");//加载动态链接库MyDll.dll文件；
+	hDLL = LoadLibrary(L"G:\\C++\\AutoLogin\\Release\\KeyBoardHook.dll");//加载动态链接库MyDll.dll文件；
 	sendMessage = (Send)GetProcAddress(hDLL, "ReportMessage");
-	sendMessage(L"Hello World");
+	byte buf[200];
+	CString s =L"Hello World";
+	memcpy(buf, s.GetBuffer(s.GetLength()), s.GetLength()+1);  //将cstring放入byte数组
+	sendMessage(buf);*/
+
+	CWnd* hwnd = FindWindow(L"WindowsForms10.Window.8.app.0.141b42a_r6_ad1", L"Form2");
+	if (hwnd != NULL) {
+		hwnd->SendMessage(WM_USER + 8, (WPARAM)9, (LPARAM)8);
+		MessageBox(L"OK");
+	}
+		
 }

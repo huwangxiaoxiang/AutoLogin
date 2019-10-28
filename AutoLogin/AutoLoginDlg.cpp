@@ -290,7 +290,7 @@ void CAutoLoginDlg::OnBnClickedButton3()
 	GetDlgItem(IDC_BUTTON5)->EnableWindow(0);
 	GetDlgItem(IDC_BUTTON6)->EnableWindow(0);
 	GetDlgItem(IDC_BUTTON3)->EnableWindow(0);
-	 LogThread->PostThreadMessage(WM_Thread1, 0, NULL);
+	LogThread->PostThreadMessage(WM_Thread1, 0, NULL);
 	}
 }
 

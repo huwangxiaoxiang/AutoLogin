@@ -61,7 +61,7 @@ BOOL TankLoginDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	FileOp op(L"e:\\info.bv");
+	FileOp op(L"info.bv");
 
 	op.Read(couterlist);
 	while (counts.GetCount() != 0)
@@ -148,7 +148,7 @@ void TankLoginDlg::OnLogin()
 			}
 		}
 		couterlist.push_back(temp);
-		FileOp op(L"e:\\info.bv");
+		FileOp op(L"info.bv");
 		op.Write(couterlist);
 	}
 	

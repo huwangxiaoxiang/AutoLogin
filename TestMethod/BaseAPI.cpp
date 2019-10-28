@@ -88,7 +88,7 @@ void BaseAPI::CMDCommand(LPTSTR command)
 
 	if (bRet)
 	{
-		WaitForSingleObject(pi.hProcess, INFINITE);// 等待程序退出
+		WaitForSingleObject(pi.hProcess, 2000);// 等待程序退出
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 	}

@@ -41,4 +41,5 @@ public:
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 	afx_msg void OnBnClickedOk();
 	CListBox messages;
+	afx_msg void OnBnClickedButton1();
 };
