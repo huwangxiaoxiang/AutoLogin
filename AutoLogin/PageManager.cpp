@@ -23,8 +23,8 @@ void PageManager::Instance()
 
 	Page* updateInfo = new Page(3, L"更新公告面板");
 	updateInfo->addKeyPoint(KeyPoint(458, -295, 16777215, BASEP_CENTER));
-	updateInfo->addKeyPoint(KeyPoint(431, -175, 731562, BASEP_CENTER));
-	updateInfo->addKeyPoint(KeyPoint(431, 270, 731562, BASEP_CENTER));
+	updateInfo->addKeyPoint(KeyPoint(358,-244,1052429, BASEP_CENTER));
+	updateInfo->addKeyPoint(KeyPoint(-67,-298,8323071, BASEP_CENTER));
 	updateInfo->setClose(458, -295, BASEP_CENTER);
 	pages.push_back(updateInfo);
 

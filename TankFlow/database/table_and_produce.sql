@@ -1,6 +1,6 @@
 use tank;
-drop table if exists damage;
-create table damage(
+drop table if exists damageo;
+create table damag(
 	id varchar(18) primary key,
     attacker varchar(30) default "-1",
     victim varchar(30) default "-1",
@@ -29,6 +29,20 @@ delimiter //
 create procedure damage_ave(in tanks varchar(30),out result decimal)
 begin
 	select AVG(m.n) into result from (select damages as n from damage where attacker=tanks) as m;
+end
+//
+delimiter ;
+
+-- 坦克更名
+drop procedure if exists rename_tank;
+delimiter //
+create procedure rename_tank(in old_name varchar(30),in new_name varchar(30),out result int)
+begin
+	set SQL_SAFE_UPDATES=0;
+	update damage set attacker = new_name where attacker = old_name;
+    update damage set victim = new_name where victim = old_name;
+    set SQL_SAFE_UPDATES=1;
+    set result=0;
 end
 //
 delimiter ;

@@ -168,8 +168,8 @@ BOOL Act::prepare()
 void Act::getOnlineGift()
 {
 	CRect rect = getProcessRect();
-	MoveTo(rect.right - 56, rect.top + 168);
-	//MoveTo(rect.right - 200, rect.top + 168);
+	//MoveTo(rect.right - 56, rect.top + 168);
+	MoveTo(rect.right - 200, rect.top + 168);
 	Sleep(100);
 	LeftClick(1);
 	Sleep(1500);
@@ -200,9 +200,11 @@ void Act::getSysGift()
 	HWND hwnd = this->getProcessHWND();
 	ActiveWindow(hwnd);
 	CRect rect = getProcessClient(hwnd);
-	this->MoveTo(rect.right - 130, rect.top + 121);
+	//this->MoveTo(rect.right - 130, rect.top + 121);
+	this->MoveTo(rect.right - 278, rect.top + 121);
 	Sleep(400);
-	this->MoveTo(rect.right - 130, rect.top + 209);
+	//this->MoveTo(rect.right - 130, rect.top + 209);
+	this->MoveTo(rect.right - 278, rect.top + 209);
 	Sleep(400);
 	this->LeftClick(1);
 	Sleep(1000);
