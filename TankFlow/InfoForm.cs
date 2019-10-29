@@ -20,10 +20,15 @@ namespace TankFlow
         const int EVENT = 30000;
         const int BATTLE_START = 36278;
         const int BATTLE_END = 36279;
+        const int SPOTED = 36281;
+        const int UNSPOTED = 36280;
         const string GameClass = "UnityWndClass";
         const string GameName = "Tank Battle";
         PCManager manager;
-       
+        volatile bool is_exit = false;
+        Thread con;
+
+
         List<Damage> damage_list=new List<Damage>();
         public TankFlow()
         {
@@ -34,13 +39,20 @@ namespace TankFlow
             this.StartPosition = FormStartPosition.Manual;
             followPosition();
             manager = new PCManager(100);
-            Thread con= new Thread(() =>
+            con= new Thread(() =>
             {
-                while (true)
+                Damage m = null;
+                while (!is_exit&&m==null)
                 {
-                    Damage m = (Damage)manager.GetProduct();
-                    Connector.add_damage(m);
+                    m = (Damage)manager.GetProduct(1000);
+                    if(m!=null)
+                        Connector.add_damage(m);
+                    else
+                    {
+                        Console.WriteLine("没有获取到产品");
+                    }
                 }
+                Console.WriteLine("消费者线程退出");
             });//创建消费者线程将数据上传至数据库
             con.Start();
             //this.Location = new System.Drawing.Point((int)(0), (int)(0));
@@ -84,7 +96,6 @@ namespace TankFlow
                     {
                         PushString(s2);
                     }
-                    
                     this.postimer.Start();
                     break;
                 case EVENT:
@@ -100,7 +111,7 @@ namespace TankFlow
         
         private void uploadData()
         {
-           /**/foreach(Damage m in damage_list)
+           foreach(Damage m in damage_list)
             {
                 if (m.valid)
                     manager.AddProductPlus(m);
@@ -122,6 +133,12 @@ namespace TankFlow
                     this.Hide();
                     Console.WriteLine("战斗结束");
                     uploadData();
+                    break;
+                case SPOTED:
+                    this.spot_state.Visible = true;
+                    break;
+                case UNSPOTED:
+                    this.spot_state.Visible = false;
                     break;
                 default:
                     Console.WriteLine(flag);
@@ -169,16 +186,22 @@ namespace TankFlow
             IntPtr forgeWindow = BaseAPI.GetForegroundWindow();
             if (hwnd != forgeWindow)
             {
-                this.Location = new System.Drawing.Point((int)(-400), (int)(-300));
+                this.TopMost = false;
+                this.Hide();
                 return;
             }
             BaseAPI.RECT client;
             BaseAPI.GetWindowRect(hwnd, out client);
-            //BaseAPI.SetForegroundWindow(hwnd);
             
             this.Location = new System.Drawing.Point((int)(client.Left + 165), (int)(client.Bottom - 210));
             this.TopMost = true;
             this.Show();
+        }
+
+        private void TankFlow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            is_exit = true;
+            con.Join();
         }
     }
 }

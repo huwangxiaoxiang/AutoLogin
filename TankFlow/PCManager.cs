@@ -37,10 +37,23 @@ namespace TankFlow
             out_mutex = new Mutex();
         }
 
+        /// <summary>
+        /// 获取一个产品，如果没有产品，则该线程将无限等待
+        /// </summary>
         public Object GetProduct()
         {
-            Object result;
-            used_resource.WaitOne();
+            return GetProduct(-1);
+        }
+
+        /// <summary>
+        /// 获取一个产品，如果没有产品，将在miniseconds毫秒后退出，此时返回值为null
+        /// </summary>
+        public Object GetProduct(int miniseconds)
+        {
+            Object result = null;
+            bool r1 = used_resource.WaitOne(miniseconds);
+            if (!r1)
+                return result;
             out_mutex.WaitOne();
 
             result = resources[out_index];
@@ -51,7 +64,9 @@ namespace TankFlow
             return result;
         }
 
-        //使用当前线程添加一个产品
+        /// <summary>
+        /// 使用当前线程添加一个产品
+        /// </summary>
         public void AddProduct(object m)
         {
             rest_resource.WaitOne();
@@ -64,7 +79,9 @@ namespace TankFlow
             used_resource.Release(1);
         }
 
-        //使用新线程添加一个产品
+        /// <summary>
+        /// 使用新线程添加一个产品
+        /// </summary>
         public void AddProductPlus(object m)
         {
             Thread th = new Thread(() =>

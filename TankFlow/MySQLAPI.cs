@@ -82,6 +82,7 @@ namespace TankFlow
             }catch(Exception e)
             {
                 Log.AddLog(e.Message);
+                Console.WriteLine("捕获到异常");
             }
             return result;
         }

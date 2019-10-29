@@ -119,8 +119,13 @@ void CTankLoginPlusDlg::OnBnClickedOk()
 		MessageBox(L"请选择区服");
 	}
 	else {
-		Start();
-		SetTimer(1, 1000, NULL);
+		if (pure_btn) {
+			DirectGame(id, key, service);
+		}
+		else {
+			Start();
+			SetTimer(1, 1000, NULL);
+		}
 		//startGames(id,key,service);
 	}
 
@@ -163,11 +168,7 @@ void CTankLoginPlusDlg::OnTimer(UINT_PTR nIDEvent)
 				lstrcpy(id, temp1);
 				lstrcpy(key, temp2);
 				//api.CMDCommand(L"taskkill /im Launcher.exe /im QQMicroGameBox.exe /im  QQMicroGameBoxTray.exe /f");
-				if (pure_btn) {
-					DirectGame(id, key, service);
-				}
-				else
-					startGames(id, key, service);
+				startGames(id, key, service);
 			}
 		}
 	}
