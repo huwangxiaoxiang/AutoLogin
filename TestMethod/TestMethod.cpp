@@ -145,23 +145,23 @@ int main()
 	RECT rect= api.getProcessRect(hwnd);
 */
 
-	HWND h4=0, h5=0, h6=0;
-	for (int i = 0; i < 2000; i++) {
-		HWND h1 = GetForegroundWindow();
-		HWND h2 = GetTopWindow(h1);
-		HWND h3 = api.getProcessHWND("UnityWndClass", "Tank Battle");
-		if (h4 == h1 && h5 == h2 && h6 == h3) {}
-		else {
-			std::cout << "forge:" << h1 << " top:" << h2 << " tank:" << h3 << std::endl;
-			h4 = h1;
-			h5 = h2;
-			h6 = h3;
-		}
 
+	HWND h3 = api.getProcessHWND("UnityWndClass", "Tank Battle");
+	
+	RECT r = api.getProcessClient(h3);
+	POINT m;
+	GetCursorPos(&m);
+	//mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, 0, 0, 0, 0);
+	//SetForegroundWindow(h3);
+	for (int i = 0; i < 2; i++) {
+		//api.MoveTo(1557, 66);
+		
+		api.LeftClick(h3, 1557, 66);
+		Sleep(1000);
+		//api.MoveTo(1251, 199);
+		api.LeftClick(h3, 1251, 199);
 		Sleep(1000);
 	}
-
-	Sleep(30000);
 
 	return 0;
 }

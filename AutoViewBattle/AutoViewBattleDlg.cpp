@@ -89,23 +89,34 @@ HCURSOR CAutoViewBattleDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
+HWND CAutoViewBattleDlg::findWindow() {
+	CWnd* window = FindWindow(L"WindowsForms10.Window.8.app.0.141b42a_r6_ad1", L"TankFlow");
+	if (!window) {
+		window = FindWindow(L"WindowsForms10.Window.8.app.0.141b42a_r8_ad1", L"TankFlow");
+		if (!window)
+			return NULL;
+	}
+	return window->GetSafeHwnd();
+}
 
 void CAutoViewBattleDlg::OnBnClickedOk()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	//CDialogEx::OnOK();
 	if (mode) {//这是按下了停止按钮
+		HWND hwnd = findWindow();
+		//::PostMessage(hwnd,WM_CLOSE, 0, 0);
 		GetDlgItem(START_BTN)->SetWindowText(L"开始观战");
 		threads->exit = true;
-		BaseAPI api;
-		api.CMDCommand(L"taskkill /im TankFlow.exe");
 		mode = false;
 	}
 	else {//这是按下了开始按钮
+		BaseAPI api;
+		//api.CMDCommand(L"TankFlow.exe");
 		GetDlgItem(START_BTN)->SetWindowText(L"停止运行");
 		threads=(Thread1*)AfxBeginThread(RUNTIME_CLASS(Thread1));
 		threads->PostThreadMessage( WM_Thread1, 0, 0);
+		PostMessage(WM_SYSCOMMAND, SC_MINIMIZE, 0);
 		mode=true;
 	}
 
@@ -114,7 +125,5 @@ void CAutoViewBattleDlg::OnBnClickedOk()
 
 void CAutoViewBattleDlg::OnBnClickedCancel()
 {
-	BaseAPI api;
-	api.CMDCommand(L"taskkill /im TankFlow.exe");
 	CDialogEx::OnCancel();
 }

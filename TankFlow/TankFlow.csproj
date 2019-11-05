@@ -131,6 +131,7 @@
   <ItemGroup>
     <Compile Include="Connector.cs" />
     <Compile Include="Damage.cs" />
+    <Compile Include="GDIDraw.cs" />
     <Compile Include="InfoForm.cs">
       <SubType>Form</SubType>
     </Compile>

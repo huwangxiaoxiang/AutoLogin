@@ -1,5 +1,4 @@
-#include "pch.h"
-#include "framework.h"
+
 #include "BaseAPI.h"
 
 
@@ -49,7 +48,6 @@ void BaseAPI::LeftClick(HWND hwnd, int x, int y)
 	PostMessage(hwnd, WM_LBUTTONDOWN, MK_LBUTTON, MAKELONG(tx, ty));
 	PostMessage(hwnd, WM_LBUTTONUP, MK_LBUTTON, MAKELONG(tx, ty));
 	mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, TransformWidth(pos.x), TransformHeight(pos.y), 0, 0);
-
 }
 
 void BaseAPI::ActiveWindow(HWND hwnd)

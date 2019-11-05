@@ -40,9 +40,16 @@ void BaseAPI::LeftClick(int count) {
 
 void BaseAPI::LeftClick(HWND hwnd, int x, int y)
 {
-	PostMessage(hwnd, WM_LBUTTONDOWN, NULL, MAKELONG(x, y));
-	Sleep(50);
-	PostMessage(hwnd, WM_LBUTTONUP, NULL, MAKELONG(x, y));
+	POINT pos;
+	GetCursorPos(&pos);
+	int tx = TransformWidth(x);
+	int ty = TransformHeight(y);
+	mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, tx, ty, 0, 0);
+	Sleep(20);
+	PostMessage(hwnd, WM_LBUTTONDOWN, MK_LBUTTON, MAKELONG(tx, ty));
+	PostMessage(hwnd, WM_LBUTTONUP, MK_LBUTTON, MAKELONG(tx, ty));
+	mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, TransformWidth(pos.x), TransformHeight(pos.y), 0, 0);
+
 }
 
 void BaseAPI::ActiveWindow(HWND hwnd)
@@ -93,7 +100,7 @@ void BaseAPI::CMDCommand(LPCTSTR command)
 	BOOL bRet = CreateProcess(NULL, commandline, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);//
 	if (bRet)
 	{
-		WaitForSingleObject(pi.hProcess, INFINITE);// 等待程序退出
+		WaitForSingleObject(pi.hProcess, 1000);// 等待程序退出
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 	}

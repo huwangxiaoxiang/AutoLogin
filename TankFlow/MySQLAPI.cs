@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TankFlow
@@ -16,11 +17,11 @@ namespace TankFlow
         static string password = "123456";
         static string database = "tank";
         private static MySqlConnection con = null;
+        private static Mutex mutex = new Mutex();
   
 
         public static bool ConnectServer()
         {
-
             string connStr = "server=" + IP + ";port=" + port.ToString() + ";user=" + username + ";password=" + password + ";database=" + database+ ";Charset=utf8";
             try
             {
@@ -28,9 +29,23 @@ namespace TankFlow
                 {
                     con = new MySqlConnection(connStr);
                     con.Open();
+                    return true;
                 }
-                else if (con.State == ConnectionState.Closed || con.State == ConnectionState.Broken)
+                if(con.State == ConnectionState.Open)
+                {
+                    return true;
+                }
+                if (con.State == ConnectionState.Broken)
+                {
+                    con.Close();
                     con.Open();
+                    return true;
+                }
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                    return true;
+                }
                 return true;
             }
             catch(Exception e)
@@ -52,6 +67,7 @@ namespace TankFlow
             catch(Exception e)
             {
                 Console.WriteLine(e.Message);
+                con = null;
                 return false;
             }
         }
@@ -59,12 +75,13 @@ namespace TankFlow
         public static int ExecuteProcedure(string pro_name, Param param)
         {
             int result = -1;
+            mutex.WaitOne();
             if (!ConnectServer())
                 return -1;
             List<MySqlParameter> parameters = param.getLists();
             MySqlCommand cmd = new MySqlCommand(pro_name, con);
+            cmd.CommandTimeout = 0;
             cmd.CommandType = CommandType.StoredProcedure;
-            // MySqlParameter outr = new MySqlParameter("",MySqlDbType.VarChar,18);
             if (parameters == null) parameters = new List<MySqlParameter>();
             
             foreach (MySqlParameter para in parameters)
@@ -78,12 +95,14 @@ namespace TankFlow
                 {
                     result = reader.GetInt16(0);
                 }
+                cmd.Dispose();
                 reader.Close();
             }catch(Exception e)
             {
-                Log.AddLog(e.Message);
-                Console.WriteLine("捕获到异常");
+                Log.AddLog(e.Message+e.StackTrace);
+                Console.WriteLine("捕获到异常:"+e.StackTrace);
             }
+            mutex.ReleaseMutex();
             return result;
         }
     }

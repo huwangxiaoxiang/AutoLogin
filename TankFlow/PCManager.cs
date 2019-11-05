@@ -57,6 +57,7 @@ namespace TankFlow
             out_mutex.WaitOne();
 
             result = resources[out_index];
+            resources[out_index]=null;
             out_index = (out_index + 1) % resource_sum;
 
             out_mutex.ReleaseMutex();

@@ -30,7 +30,7 @@ void Thread1::run()
 	BaseAPI api;
 	PageManager::Instance();
 	//int result = (int)ShellExecute(NULL, L"open", DataDir, NULL, NULL, SW_SHOW);//打开主程序
-	api.CMDCommand(L"G:\\C++\\AutoLogin\\TankFlow\\bin\\Release\\TankFlow.exe");
+	
 	while (exit==false) {
 		HWND hwnd = api.getProcessHWND(L"UnityWndClass", L"Tank Battle");
 		if (hwnd == NULL) {
@@ -46,7 +46,12 @@ void Thread1::run()
 			api.MoveTo(m);
 			Sleep(200);
 			api.LeftClick(1);
+			Sleep(500);
+			KeyPoint n(-214, -239, 0, BASEP_CENTER);
+			m = n.getAbsoluteXY(hwnd);
+			api.LeftClick(hwnd, m.x, m.y);
 		}
+		Sleep(500);
 		std::vector<int> avaliable;
 		for (int i = 2; i < 8; i++) {
 			now = PageManager::isThisPage(i, hwnd);
@@ -58,21 +63,17 @@ void Thread1::run()
 			std::default_random_engine e;
 			int randm = e() % avaliable.size();
 			now = PageManager::getPage(*(avaliable.begin()+randm));
-			if (now->getIndex() == -1) {
-				Sleep(5000);
-				continue;
+			if (now->getIndex() != -1) {
+				api.ActiveWindow(hwnd);
+				KeyPoint p = *(now->getKeyPoints().begin());
+				api.MoveTo(p.getAbsoluteXY(hwnd));
+				Sleep(200);
+				api.LeftClick(1);
 			}
-			api.ActiveWindow(hwnd);
-			KeyPoint p = *(now->getKeyPoints().begin());
-			api.MoveTo(p.getAbsoluteXY(hwnd));
-			Sleep(200);
-			api.LeftClick(1);
-			Sleep(1000);
 		}
 		SetForegroundWindow(old);
 		Sleep(5000);
 	}
-	api.CMDCommand(L"taskkill /im TankFlow.exe");
 }
 
 BOOL Thread1::InitInstance()

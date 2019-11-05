@@ -25,37 +25,19 @@ namespace TankFlow
         const string GameClass = "UnityWndClass";
         const string GameName = "Tank Battle";
         PCManager manager;
-        volatile bool is_exit = false;
-        Thread con;
-
-
+        bool is_lock = true;
         List<Damage> damage_list=new List<Damage>();
+        Damage[] temp_damage = new Damage[6];
+
         public TankFlow()
         {
             InitializeComponent();
             initWindow();
-            
             this.postimer.Stop();
             this.StartPosition = FormStartPosition.Manual;
             followPosition();
             manager = new PCManager(100);
-            con= new Thread(() =>
-            {
-                Damage m = null;
-                while (!is_exit&&m==null)
-                {
-                    m = (Damage)manager.GetProduct(1000);
-                    if(m!=null)
-                        Connector.add_damage(m);
-                    else
-                    {
-                        Console.WriteLine("没有获取到产品");
-                    }
-                }
-                Console.WriteLine("消费者线程退出");
-            });//创建消费者线程将数据上传至数据库
-            con.Start();
-            //this.Location = new System.Drawing.Point((int)(0), (int)(0));
+          
         }
 
         //初始化窗口数据
@@ -67,34 +49,79 @@ namespace TankFlow
             label4.Text = "";
             label5.Text = "";
             label6.Text = "";
+            for (int i = 0; i < 6; i++)
+                temp_damage[i] = new Damage("");
+            drawLabels();
+            this.spot_state.Visible = false;
         }
 
         //添加字符串至窗口
-        public void PushString(string s)
+        public void PushString(Damage s)
         {
-            label6.Text = label5.Text;
-            label5.Text = label4.Text;
-            label4.Text = label3.Text;
-            label3.Text = label2.Text;
-            label2.Text = label1.Text;
-            label1.Text = s;
+            for (int i = 5; i > 0; i--)
+                temp_damage[i] = temp_damage[i - 1];
+            temp_damage[0] = s;
+            drawLabels();
+        }
+
+        /// <summary>
+        /// 绘制伤害面板上的所有伤害数据
+        /// </summary>
+        /// <param name="m"></param>
+        void drawLabels()
+        {
+            Point init = new Point(1, 36);
+            int dy = 30;
+            int width = 350, height = 25;
+            Graphics g = this.CreateGraphics();
+            Brush back_brush = new SolidBrush(this.BackColor);
+            for (int i = 0; i < 6; i++)
+            {
+                Damage temp = temp_damage[i];
+                if (!temp.valid)
+                    return;
+                Rectangle rect = new Rectangle(init.X + 1, init.Y + i * dy, width, height);
+                g.FillRectangle(back_brush, rect);
+                Color font_color,border_color;
+                border_color = Color.FromArgb(10, 0, 0);
+                if (temp_damage[i].friend)
+                    font_color = Color.FromArgb(80, 215, 120);
+                else
+                    font_color = Color.FromArgb(239, 32, 0);
+                GDIDraw.Paint_Text(temp.fillspace(10,temp.source),rect,font_color,border_color,g, 14f);
+                rect.Offset(115, 0);
+                GDIDraw.Paint_Text("->", rect, font_color, border_color, g, 14f);
+                rect.Offset(30, 0);
+                GDIDraw.Paint_Text(temp.fillspace(10, temp.victim), rect, font_color, border_color, g, 14f);
+                rect.Offset(115, 0);
+                GDIDraw.Paint_Text(temp.GetDamageType(), rect, font_color, border_color, g, 14f);
+            }
+            g = null;
+            back_brush.Dispose();
         }
 
         //消息处理函数
         /**/
         protected override void DefWndProc(ref System.Windows.Forms.Message m)
         {
+            //is_lock = false;
+            if (m.Msg == 32770)
+                is_lock = false;
+            if (is_lock)
+            {
+                base.DefWndProc(ref m);
+                return;
+            }
             switch (m.Msg)
              {
                  case WM_COPYDATA:
                     string s1=getCopyMessage(ref m);
                     Console.WriteLine("收到字符串：" + s1);
                     Damage dama = new Damage(s1);
-                    string s2 = dama.parse();
-                    damage_list.Add(dama);
-                    if (!s2.Equals(""))
+                    if (dama.valid)
                     {
-                        PushString(s2);
+                        damage_list.Add(dama);
+                        PushString(dama);
                     }
                     this.postimer.Start();
                     break;
@@ -111,12 +138,37 @@ namespace TankFlow
         
         private void uploadData()
         {
-           foreach(Damage m in damage_list)
+           foreach(Damage data in damage_list)
             {
-                if (m.valid)
-                    manager.AddProductPlus(m);
+                if (data.valid)
+                {
+                    manager.AddProductPlus(data);
+                }
             }
             damage_list.Clear();
+            Thread consumer = new Thread(() =>
+            {
+                int times = 0;
+                int fail = 0;
+                Log.AddLog("消费者线程开始");
+                Console.WriteLine("消费者线程开始：" +DateTime.Now.ToString());
+                while (true)
+                {
+                    Damage m = (Damage)manager.GetProduct(10000);
+                    if (m != null)
+                    {
+                        if (!Connector.add_damage(m))
+                            fail++;
+                        times++;
+                        m = null;
+                    }
+                    else
+                        break;
+                }
+                Console.WriteLine("消费者线程结束，上传数据：" + times.ToString()+" 结束时间:"+DateTime.Now.ToString());
+                Log.AddLog("消费者线程结束，上传数据：" + times.ToString()+" 失败数："+fail.ToString());
+            });
+            consumer.Start();
         }
 
         private void OnHandleEvent(int flag)
@@ -125,6 +177,7 @@ namespace TankFlow
             {
                 case BATTLE_START:
                     initWindow();
+                    this.Show();
                     this.postimer.Start();
                     Console.WriteLine("战斗开始");
                     break;
@@ -136,6 +189,8 @@ namespace TankFlow
                     break;
                 case SPOTED:
                     this.spot_state.Visible = true;
+                    this.Show();
+                    this.postimer.Start();
                     break;
                 case UNSPOTED:
                     this.spot_state.Visible = false;
@@ -186,22 +241,18 @@ namespace TankFlow
             IntPtr forgeWindow = BaseAPI.GetForegroundWindow();
             if (hwnd != forgeWindow)
             {
-                this.TopMost = false;
-                this.Hide();
+                this.Location = new System.Drawing.Point(-300,-300);
                 return;
             }
-            BaseAPI.RECT client;
-            BaseAPI.GetWindowRect(hwnd, out client);
-            
-            this.Location = new System.Drawing.Point((int)(client.Left + 165), (int)(client.Bottom - 210));
-            this.TopMost = true;
-            this.Show();
+          this.TopMost = true;
+          BaseAPI.RECT client;
+          BaseAPI.GetWindowRect(hwnd, out client);
+          this.Location = new System.Drawing.Point((int)(client.Left + 165), (int)(client.Bottom - 220));
         }
 
         private void TankFlow_FormClosed(object sender, FormClosedEventArgs e)
         {
-            is_exit = true;
-            con.Join();
+            Application.Exit();
         }
     }
 }

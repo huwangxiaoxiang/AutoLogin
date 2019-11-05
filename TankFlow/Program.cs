@@ -20,7 +20,6 @@ namespace TankFlow
         [STAThread]
         static void Main()
         {
-
             mutex = new Mutex(true, "TankFlow.exe");
             if (mutex.WaitOne(0, false))
             {

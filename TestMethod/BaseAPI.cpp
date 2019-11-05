@@ -25,18 +25,23 @@ void BaseAPI::LeftClick(int count) {
 	GetCursorPos(&pos);
 	for (int i = 0; i < count; i++) {
 		mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTDOWN, TransformWidth(pos.x), TransformHeight(pos.y), 0, 0);
-		Sleep(100);
+		Sleep(50);
 		mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTUP, TransformWidth(pos.x), TransformHeight(pos.y), 0, 0);
-		Sleep(200);
 	}
+	MoveTo(pos.x, pos.y);
 }
 
 void BaseAPI::LeftClick(HWND hwnd, int x, int y)
 {
-
-	PostMessage(hwnd, WM_LBUTTONDOWN, NULL, MAKELONG(x, y));
-	Sleep(80);
-	PostMessage(hwnd, WM_LBUTTONUP, NULL, MAKELONG(x, y));
+	POINT pos;
+	GetCursorPos(&pos);
+	int tx = TransformWidth(x);
+	int ty = TransformHeight(y);
+	mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, tx,ty , 0, 0);
+	Sleep(20);
+	PostMessage(hwnd, WM_LBUTTONDOWN, MK_LBUTTON, MAKELONG(tx, ty));
+	PostMessage(hwnd, WM_LBUTTONUP, MK_LBUTTON, MAKELONG(tx, ty));
+	mouse_event(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE, TransformWidth(pos.x), TransformHeight(pos.y), 0, 0);
 }
 
 void BaseAPI::ActiveWindow(HWND hwnd)

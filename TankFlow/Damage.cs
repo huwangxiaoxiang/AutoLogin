@@ -5,31 +5,32 @@ using System.Text;
 
 namespace TankFlow
 {
-    class Damage
+    public class Damage
     {
-        public string source;
-        public string victim;
+        public string source="";
+        public string victim="";
         public int damage;//潜在伤害
         public int type;
         public int victimId;
         public int battleType;
         public int battleId;
         public bool valid = true;
+        public bool friend=false;
         
-        string GetDamageType()
+       public string GetDamageType()
         {
             switch (type)
             {
                 case 20:
-                    return damage.ToString() + "    (击毁)";
+                    return damage.ToString() + "(击毁)";
                 case 1:
-                    return "普通伤害";
+                    return damage.ToString();
                 case 5:
                     return "未击穿";
                 case 9:
-                    return damage.ToString() + "    (暴击)";
+                    return damage.ToString() + "(暴击)";
                 case 17:
-                    return "友军伤害";
+                    return "0";
                 default:
                     return "";
             }
@@ -61,7 +62,13 @@ namespace TankFlow
                 victimId = int.Parse(mm[4]);
                 battleType = int.Parse(mm[5]);
                 battleId = int.Parse(mm[6]);
+                if (int.Parse(mm[7]) == 0)
+                    friend = true;
+                else
+                    friend = false;
                 valid = true;
+                if (type == 17)
+                    valid = false;
             }
             catch(Exception e)
             {
@@ -74,29 +81,26 @@ namespace TankFlow
         public string parse()
         {
             string result = "";
-            if (type == 17)
-                return "";
             if (damage > 0)
             {
-                result = source + "->" + victim;
-                result = fillspace(20, result);
-                if (type == 5 || type == 20 || type == 9)
-                    result = result + GetDamageType();
-                else
-                {
-                    result = result + damage.ToString();
-                }
+                result = fillspace(10,source) + "  ->  " + fillspace(10,victim);
+                result = result + "    "+ GetDamageType();
             }
             
             return result;
         }
 
-        private string fillspace(int sum,string source)
+        public string fillspace(int sum,string source)
         {
             int length = source.Length;
             for (; length < sum; length++)
             {
                 source = source + " ";
+            }
+            if (source.Length > sum)
+            {
+                source = source.Substring(0, sum - 3);
+                source = source + "...";
             }
             return source;
         }

@@ -42,6 +42,7 @@ BEGIN_MESSAGE_MAP(CTankLoginPlusDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CTankLoginPlusDlg::OnBnClickedOk)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_CHECK1, &CTankLoginPlusDlg::OnBnClickedCheck1)
+	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 
@@ -56,10 +57,14 @@ BOOL CTankLoginPlusDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-	// TODO: 在此添加额外的初始化代码
+	BaseAPI api;
+	api.CMDCommand(L"dll\\TankFlow.exe");
 
 	for (int i = 0; i < 7; i++) {
 		ServerBox.AddString(services[i]);
+	}
+	if (!checkDLL()) {
+		exit(0);
 	}
 	
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -101,11 +106,33 @@ HCURSOR CTankLoginPlusDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+BOOL CTankLoginPlusDlg::checkDLL() {
+	TCHAR dll_path[MAX_PATH] = { 0 };
+	TCHAR target_path[MAX_PATH] = { 0 };
+	LPTSTR tankdir = getTankDir();
+	
+	GetModuleFileName(NULL, dll_path, MAX_PATH);
+	(_tcsrchr(dll_path, _T('\\')))[1] = 0;
+	PathAppend(dll_path, L"dll\\KeyBoardHOOK.dll");
 
+	lstrcat(target_path, tankdir);
+	lstrcat(target_path, L"Tank_Data\\Managed\\KeyBoardHOOK.dll");
+	BOOL exist = Is_exist(dll_path);
+	if (exist) {
+		CopyFile(dll_path, target_path, false);
+		return TRUE;
+	}
+	else {
+		MessageBox(L"缺失重要组件，插件无法正常使用！请重新下载完整安装包", L"组件缺失", 0);
+		return FALSE;
+	}
+
+
+}
 
 void CTankLoginPlusDlg::OnBnClickedOk()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	CString ser;
 	ServerBox.GetWindowText(ser);
 	this->service = -1;
@@ -120,7 +147,8 @@ void CTankLoginPlusDlg::OnBnClickedOk()
 	}
 	else {
 		if (pure_btn) {
-			DirectGame(id, key, service);
+			//DirectGame(id, key, service);
+			Start();
 		}
 		else {
 			Start();
@@ -142,7 +170,6 @@ void CTankLoginPlusDlg::Start()
 		MessageBox(NULL, L"启动错误", NULL);
 	Sleep(3000);
 }
-
 
 void CTankLoginPlusDlg::OnTimer(UINT_PTR nIDEvent)
 {
@@ -199,7 +226,7 @@ BOOL CTankLoginPlusDlg::startGames(LPTSTR ID, LPTSTR key, int serverID)
 	_stprintf_s(store_dll, L"%sTank_Data\\Managed\\Assembly%d.dll", tankdir,(long)now);
 	GetModuleFileName(NULL, my_dll2, MAX_PATH);
 	(_tcsrchr(my_dll2, _T('\\')))[1] = 0;
-	PathAppend(my_dll2, L"Assembly.dll");
+	PathAppend(my_dll2, L"dll\\Assembly.dll");
 
 	LPTSTR avaliable_dll;
 	if (Is_exist(my_dll2))
@@ -227,13 +254,26 @@ BOOL CTankLoginPlusDlg::startGames(LPTSTR ID, LPTSTR key, int serverID)
 
 	STARTUPINFO si = { sizeof(si) };
 	PROCESS_INFORMATION pi;
+	SetCurrentDirectory(tankdir);
 	BOOL tank = CreateProcess(NULL, GameStartCMD(ID,key,serverID), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 
 	Sleep(2000);
 	DeleteFile(csharp_dll);
 	_trename(temp_dll, csharp_dll);
 
+	HWND hwnd = findWindow();
+	::PostMessage(hwnd, 32770, 0, 0);
 	return TRUE;
+}
+
+HWND CTankLoginPlusDlg::findWindow() {
+	CWnd* window = FindWindow(L"WindowsForms10.Window.8.app.0.141b42a_r6_ad1", L"TankFlow");
+	if (!window) {
+		window = FindWindow(L"WindowsForms10.Window.8.app.0.141b42a_r8_ad1", L"TankFlow");
+		if (!window)
+			return NULL;
+	}
+	return window->GetSafeHwnd();
 }
 
 FILETIME CTankLoginPlusDlg::get_Filetime(LPTSTR path)
@@ -249,6 +289,7 @@ BOOL CTankLoginPlusDlg::DirectGame(LPTSTR ID, LPTSTR key, int serverID)
 {
 	STARTUPINFO si = { sizeof(si) };
 	PROCESS_INFORMATION pi;
+	SetCurrentDirectory(getTankDir());
 	BOOL tank = CreateProcess(NULL, GameStartCMD(ID, key, serverID), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 
 	Sleep(2000);
@@ -280,7 +321,6 @@ LPTSTR CTankLoginPlusDlg::getTankDir()
 	return DataDir;
 }
 
-
 BOOL CTankLoginPlusDlg::Is_exist(LPTSTR path) {
 	std::fstream _file;
 	_file.open(path, std::ios::in);
@@ -294,10 +334,19 @@ BOOL CTankLoginPlusDlg::Is_exist(LPTSTR path) {
 	}
 }
 
-
-
 void CTankLoginPlusDlg::OnBnClickedCheck1()
 {
 	UpdateData(true);
 	
+}
+
+
+void CTankLoginPlusDlg::OnClose()
+{
+	HWND hwnd = findWindow();
+	::PostMessage(hwnd, WM_CLOSE, 0, 0);
+	BaseAPI api;
+	api.CMDCommand(L"taskkill /F /im TankFlow.exe");
+	api.CMDCommand(L"taskkill /F /im TankFlow.exe");
+	CDialogEx::OnClose();
 }

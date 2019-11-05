@@ -29,6 +29,7 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
+	BOOL checkDLL();
 	DECLARE_MESSAGE_MAP()
 	CString services[7] = { CString("华南一区"),CString("华东一区"),CString("华东二区"),CString("华南二区"),CString("华北一区"),CString("华东三区"),CString("华南三区") };
 	BaseAPI api;
@@ -51,8 +52,10 @@ private:
 	LPTSTR getTankDir();
 	BOOL Is_exist(LPTSTR path);
 	BOOL startGames(LPTSTR ID, LPTSTR key, int serverID);
+	HWND findWindow();
 	FILETIME get_Filetime(LPTSTR path);
 public:
 	BOOL pure_btn;
 	afx_msg void OnBnClickedCheck1();
+	afx_msg void OnClose();
 };
